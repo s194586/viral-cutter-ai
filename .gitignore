@@ -1,0 +1,16 @@
+# Ciężkie pliki wideo i audio
+input/
+cuts/
+ready_to_post/
+*.mp4
+*.mp3
+
+# Dane i metadane (często bardzo duże)
+metadata/
+transcripts/
+cache/
+__pycache__/
+*.json
+
+# Tajne klucze (API KEY!) - NIGDY nie wysyłaj tego na GitHub
+.env
