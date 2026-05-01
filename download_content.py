@@ -10,12 +10,44 @@ import argparse
 import json
 import shutil
 import random
+import subprocess
 from yt_dlp import YoutubeDL
 
 
 def ensure_dirs(input_dir, metadata_dir):
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(metadata_dir, exist_ok=True)
+
+
+def file_has_audio(path):
+    cmd = [
+        'ffprobe',
+        '-v', 'error',
+        '-select_streams', 'a',
+        '-show_entries', 'stream=index',
+        '-of', 'csv=p=0',
+        str(path),
+    ]
+    completed = subprocess.run(cmd, capture_output=True, text=True)
+    return bool(completed.stdout.strip())
+
+
+def merge_video_audio(video_path, audio_path, output_path):
+    cmd = [
+        'ffmpeg',
+        '-y',
+        '-i', str(video_path),
+        '-i', str(audio_path),
+        '-map', '0:v:0',
+        '-map', '1:a:0',
+        '-c:v', 'copy',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-shortest',
+        str(output_path),
+    ]
+    subprocess.run(cmd, check=True)
+    return output_path
 
 
 def find_latest_file(folder, ext):
@@ -88,7 +120,7 @@ def progress_hook(d):
 def download_content(url, input_dir, metadata_dir, prefer_1080=True):
     ensure_dirs(input_dir, metadata_dir)
 
-    # Prefer best video up to 1080p and merge to mp4; also extract mp3 audio and keep video
+    # Prefer best video up to 1080p and merge to mp4 with audio.
     format_selector = 'bestvideo[height<=1080]+bestaudio/best' if prefer_1080 else 'best'
 
     ydl_opts = {
@@ -99,13 +131,6 @@ def download_content(url, input_dir, metadata_dir, prefer_1080=True):
         'noplaylist': True,
         'progress_hooks': [progress_hook],
         'concurrent_fragment_downloads': 4,
-        'postprocessors': [
-            {
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }
-        ],
         'keepvideo': True,
         'continuedl': True,
     }
@@ -119,8 +144,13 @@ def download_content(url, input_dir, metadata_dir, prefer_1080=True):
     latest_mp3 = find_latest_file(input_dir, '.mp3')
     latest_info = find_latest_file(input_dir, '.info.json')
 
+    merged_mp4 = None
     if latest_mp4:
-        print(f'Wideo zapisane: {latest_mp4}')
+        if file_has_audio(latest_mp4):
+            merged_mp4 = latest_mp4
+            print(f'Wideo zapisane i zawiera audio: {latest_mp4}')
+        else:
+            print(f'Znaleziono wideo bez audio: {latest_mp4}')
     else:
         print('Uwaga: nie znaleziono pobranego pliku wideo (.mp4).')
 
@@ -128,6 +158,22 @@ def download_content(url, input_dir, metadata_dir, prefer_1080=True):
         print(f'Audio zapisane: {latest_mp3}')
     else:
         print('Uwaga: nie znaleziono pliku audio (.mp3).')
+
+    if merged_mp4 is None and latest_mp4 and latest_mp3:
+        merged_filename = os.path.splitext(os.path.basename(latest_mp4))[0] + '_merged.mp4'
+        merged_path = os.path.join(input_dir, merged_filename)
+        print(f'Łączę wideo i audio do: {merged_path}')
+        merge_video_audio(latest_mp4, latest_mp3, merged_path)
+        if file_has_audio(merged_path):
+            merged_mp4 = merged_path
+            print(f'Połączone wideo zapisane: {merged_mp4}')
+        else:
+            print('Nie udało się utworzyć połączonego pliku MP4 z audio.')
+
+    if merged_mp4:
+        print(f'Finalny plik MP4 do cięcia: {merged_mp4}')
+    else:
+        print('Finalny plik MP4 z audio nie jest dostępny. Sprawdź dane wejściowe.')
 
     if latest_info:
         # skopiuj info.json do metadata
