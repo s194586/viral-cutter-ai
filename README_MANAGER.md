@@ -18,25 +18,53 @@ python manager.py --url "..." --cleanup
 
 # Test/Debug: pomiń pobieranie i transkrypcję
 python manager.py --url "..." --skip-download
+
+# Debug: pomiń albo wymuś AI Subtitler Checker
+python manager.py --url "..." --skip-subtitle-checker
+python manager.py --url "..." --force-subtitle-checker
 ```
 
 **Workflow Manager:**
 1. ✅ Sprawdza i tworzy niezbędne foldery (input/, metadata/, transcripts/, cuts/raw/, cuts/subtitles/)
 2. 📥 **Pobieranie** - `download_content.py` (wideo z YouTube max 1080p, audio, metadane)
 3. 🎙️ **Transkrypcja** - `transcribe_podcast.py` (dzielenie po ciszy, Google Gemini API)
-4. 📊 **Analiza** - `analyze_virals.py` (heatmapa + transkrypcja → top momenty)
-5. ✂️ **Wycinanie** - `cutter.py` (shoty 9:16 zapisywane od razu do `cuts/raw/`)
-6. 📝 **Napisy** - `subtitler.py` (małe białe napisy z czarnym obrysem, nisko na dole)
-7. 🧹 **Cleanup** (opcjonalnie) - usuwa wideo z input/ po sukcesie
+4. 🔎 **AI Subtitler Checker** - `subtitler_checker.py` (timing, sens językowy, próbki audio pod halucynacje)
+5. 📊 **Analiza** - `analyze_virals.py` (heatmapa + transkrypcja → top momenty)
+6. ✂️ **Wycinanie** - `cutter.py` (shoty 9:16 zapisywane od razu do `cuts/raw/`)
+7. 📝 **Napisy** - `subtitler.py` (małe białe napisy z czarnym obrysem, nisko na dole)
+8. 🧹 **Cleanup** (opcjonalnie) - usuwa wideo z input/ po sukcesie
 
 **Obsługa błędów:**
 - Retry logic dla transkrypcji (2 próby)
+- Raport jakości transkrypcji: `metadata/subtitle_check_report.json`
 - Jasne komunikaty o błędach
 - Graceful shutdown na Ctrl+C
 
 ---
 
-### 2. `subtitler.py` — Dynamiczne Napisy
+### 2. `subtitler_checker.py` — AI Subtitler Checker
+Weryfikuje transkrypcję przed analizą i generowaniem napisów.
+
+```bash
+python subtitler_checker.py \
+  --audio input/audio.mp3 \
+  --transcript transcripts/final_transcript.json \
+  --report metadata/subtitle_check_report.json
+```
+
+**Funkcjonalność:**
+- ✅ Lokalna kontrola timestampów, pustych segmentów, overlapów i tempa słów
+- ✅ Heurystyki sensowności tekstu: artefakty modelu, powtórzenia, podejrzane znaki
+- ✅ Krótkie próbki audio porównywane przez Gemini z tekstem transkrypcji
+- ✅ Wykrywanie podejrzanych halucynacji: słowa w transkrypcji, których nie słychać w próbce
+- ✅ Raport JSON ze statusem `pass`, `warning` albo `fail`
+
+**Output:**
+- `metadata/subtitle_check_report.json` - score, lista problemów i wyniki próbek AI
+
+---
+
+### 3. `subtitler.py` — Dynamiczne Napisy
 Dodaje napisy na wycięte wideo z transkrypcji.
 
 ```bash
@@ -51,7 +79,7 @@ python subtitler.py \
 - ✅ 1-2 słowa na ekranie (dynamiczny rozsplit transkrypcji)
 - ✅ Mała, czytelna czcionka dopasowana do shotów
 - ✅ Białe napisy z cienkim czarnym obrysem
-- ✅ Umieszczone nisko przy dole (Alignment=2, MarginV=25)
+- ✅ Umieszczone nisko przy dole (Alignment=2, MarginV=65)
 - ✅ Bezpieczne strefy (nie zasłaniają UI TikToka/Shortsów)
 
 **Output:**
@@ -60,7 +88,7 @@ python subtitler.py \
 
 ---
 
-### 3. Pozostałe Komponenty
+### 4. Pozostałe Komponenty
 
 #### `download_content.py`
 ```bash
@@ -101,7 +129,8 @@ python cutter.py --windows top_windows.json --output-dir cuts/raw
 ```
 project/
 ├── input/                          # Pobrane wideo/audio
-├── metadata/                       # Metadane (.info.json) i heatmapy
+├── metadata/                       # Metadane, heatmapy i raport checkera
+│   └── subtitle_check_report.json  # Raport AI Subtitler Checkera
 ├── transcripts/                    # Transkrypcje (JSON)
 │   ├── Naruciak_Final.json        # Główna transkrypcja
 │   └── cache/                      # Temp cache dla transkrypcji
@@ -110,6 +139,7 @@ project/
 │   └── subtitles/                 # Wycinki z napisami (FINAL)
 ├── top_windows.json                # Wybrane momenty
 ├── manager.py                      # 🎬 GŁÓWNY ORKESTRATOR
+├── subtitler_checker.py            # 🔎 Kontrola transkrypcji i halucynacji
 ├── subtitler.py                    # 📝 Dodawanie napisów
 ├── download_content.py             # 📥 Pobieranie
 ├── transcribe_podcast.py           # 🎙️ Transkrypcja
@@ -209,7 +239,9 @@ export GOOGLE_API_KEY="your-key"
 
 - Napisy są **wbijane bezpośrednio** (burnt-in) za pomocą filtru ffmpeg `subtitles`
 - Tekst: dynamiczny (1-2 słowa), mała czytelna czcionka
-- Safe zones: nisko przy dole, MarginV=25
+- Safe zones: nisko przy dole, MarginV=65
+- AI Subtitler Checker działa po transkrypcji i przed wyborem viralowych momentów
+- Jeśli raport checkera jest aktualny i ma status `pass` albo `warning`, manager nie odpala go ponownie
 - Wszystkie procesy logują output dla debugowania
 - Workflow jest modularny - każdy krok można uruchomić niezależnie
 
@@ -217,9 +249,12 @@ export GOOGLE_API_KEY="your-key"
 
 ## 🎬 Przyszłe Ulepszenia
 
-- [ ] Support dla innych języków (OCR/TTS)
-- [ ] Automatyczne testy
-- [ ] GUI/WebUI dla managera
-- [ ] Batch processing (wiele wideo na raz)
-- [ ] Custom fontki/kolory dla napisów
-- [ ] Export do TikTok/YouTube Shorts API
+- [ ] **Face Tracking** - zastąpienie sztywnego center crop inteligentnym kadrowaniem, które podąża za mówiącą osobą.
+- [ ] **Background Music & SFX** - automatyczne nakładanie cichego podkładu muzycznego oraz efektów dźwiękowych podkreślających kluczowe słowa.
+- [ ] **AI Content Checker** - system oceny wiralowości, który analizuje wycięte fragmenty pod kątem dynamiki i potencjału zasięgowego.
+- [ ] **Pełny Frontend** - graficzny interfejs użytkownika do zarządzania projektami i podglądu wideo przed eksportem.
+- [ ] **Batch Processing** - obsługa wielu filmów naraz w jednym przebiegu workflow.
+- [ ] **Personalizacja napisów** - konfiguracja fontów, kolorów, rozmiaru i pozycji napisów.
+- [ ] **Eksport do platform** - automatyczne publikowanie lub przygotowanie eksportu pod TikTok i YouTube Shorts API.
+- [ ] **Automatyczne testy** - testy regresji dla pobierania, transkrypcji, cięcia i generowania napisów.
+- [ ] **Obsługa wielu języków** - rozszerzenie workflow o inne języki, OCR i TTS.

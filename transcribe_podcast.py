@@ -247,9 +247,30 @@ def transcribe_chunk(chunk_path: Path, model_name: str, api_key: str, max_retrie
 
     model = genai.GenerativeModel(model_name)
     prompt = (
-        "Przetranskrybuj załączony plik audio. Zwróć WYŁĄCZNIE czyste JSON-owe pole będące tablicą obiektów. "
-        "Każdy obiekt musi mieć klucze \"start\", \"end\", \"text\". Czas w formacie MM:SS (np. \"00:00\"). "
-        "Nie dodawaj żadnego dodatkowego tekstu ani formatowania."
+        "Przetranskrybuj załączony plik audio. Zwróć WYŁĄCZNIE czyste JSON-owe pole będące tablicą obiektów.\n"
+        "Każdy obiekt MUSI mieć klucze:\n"
+        "- \"start\": czas początku w formacie MM:SS (np. \"00:00\")\n"
+        "- \"end\": czas końca w formacie MM:SS\n"
+        "- \"text\": transkrybowany tekst\n"
+        "- \"speaker\": ID mówcy (\"Speaker A\", \"Speaker B\", \"Speaker C\" itp.) - OBOWIĄZKOWE\n"
+        "- \"importance\": skala 1-5, gdzie 5 to słowa kluczowe, emocjonalne, przekleństwa, krzyki\n"
+        "- \"chaos\": true/false - true jeśli w segmencie słychać przekrzykiwanie, szum, wiele głosów jednocześnie\n\n"
+        "Instrukcje dodatkowe:\n"
+        "1. Rozpoznaj rozmówców i przypisz im spójne ID (Speaker A, Speaker B, itd.)\n"
+        "2. Dla każdego fragmentu oceń jego znaczenie w skali 1-5:\n"
+        "   5 = kluczowe słowo, emocjonalny krzyk, przekleństwo, pytanie retoryczne\n"
+        "   4 = ważne informacje\n"
+        "   3 = zwykła rozmowa\n"
+        "   2 = wypełniacze, umowy\n"
+        "   1 = tło, szum\n"
+        "3. Oznacz jako chaos=true jeśli w tym momencie:\n"
+        "   - Kilka osób mówi jednocześnie\n"
+        "   - Jest wysoki poziom szumu tła\n"
+        "   - Słowa są trudne do zrozumienia\n"
+        "4. Nie dodawaj żadnego dodatkowego tekstu ani formatowania. TYLKO JSON.\n"
+        "PRZYKŁAD:\n"
+        "[{\"start\":\"00:00\",\"end\":\"00:05\",\"text\":\"Cześć, jak się masz?\",\"speaker\":\"Speaker A\",\"importance\":3,\"chaos\":false},"
+        "{\"start\":\"00:05\",\"end\":\"00:10\",\"text\":\"Świetnie!\",\"speaker\":\"Speaker B\",\"importance\":2,\"chaos\":false}]"
     )
 
     for attempt in range(1, max_retries + 1):

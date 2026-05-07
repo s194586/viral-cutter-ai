@@ -12,10 +12,11 @@ Workflow:
   1. Sprawdza i tworzy niezbędne foldery
   2. Pobiera wideo (download_content.py)
   3. Transkrybuje audio (transcribe_podcast.py)
-  4. Analizuje viralowe momenty (analyze_virals.py)
-  5. Wycina segmenty (cutter.py)
-  6. Dodaje napisy (subtitler.py)
-  7. Opcjonalnie: czyszcze pliki z input/ (--cleanup)
+  4. Sprawdza transkrypcję i timing napisów (subtitler_checker.py)
+  5. Analizuje viralowe momenty (analyze_virals.py)
+  6. Wycina segmenty (cutter.py)
+  7. Dodaje napisy (subtitler.py)
+  8. Opcjonalnie: czyszcze pliki z input/ (--cleanup)
 """
 
 import argparse
@@ -65,10 +66,21 @@ class ManagerError(Exception):
 class WorkflowManager:
     """Orkestrator workflow transkrypcji i cuttingu."""
     
-    def __init__(self, url: str, cleanup: bool = False, skip_download: bool = False):
+    def __init__(
+        self,
+        url: str,
+        cleanup: bool = False,
+        skip_download: bool = False,
+        skip_subtitle_checker: bool = False,
+        force_subtitle_checker: bool = False,
+        auto_fix_subtitles: bool = False,
+    ):
         self.url = url
         self.cleanup = cleanup
         self.skip_download = skip_download
+        self.skip_subtitle_checker = skip_subtitle_checker
+        self.force_subtitle_checker = force_subtitle_checker
+        self.auto_fix_subtitles = auto_fix_subtitles
         self.script_dir = Path(__file__).parent
         
         # Foldery
@@ -81,6 +93,7 @@ class WorkflowManager:
         
         # Pliki
         self.transcript_file = self.transcripts_dir / 'final_transcript.json'
+        self.subtitle_check_report_file = self.metadata_dir / 'subtitle_check_report.json'
         self.heatmap_file = self.metadata_dir / 'heatmap.json'
         self.windows_file = self.script_dir / 'top_windows.json'
     
@@ -267,9 +280,51 @@ class WorkflowManager:
         
         # Retry 2 razy dla transkrypcji (czasami API się wysypuje)
         return self.run_command(cmd, "2️⃣  Transkrypcja audio", max_retries=2)
+
+    def check_subtitles(self) -> bool:
+        """Krok 3: Zweryfikuj transkrypcję, timing i potencjalne halucynacje."""
+        if not self.transcript_file.exists():
+            print(f"✗ Plik transkrypcji nie istnieje: {self.transcript_file}")
+            return False
+
+        audio_file = self.find_latest_audio()
+        if not audio_file:
+            print("✗ Nie znaleziono pliku audio w input/")
+            return False
+
+        if self.subtitle_check_report_file.exists() and not self.force_subtitle_checker:
+            source_mtime = max(self.transcript_file.stat().st_mtime, audio_file.stat().st_mtime)
+            if self.subtitle_check_report_file.stat().st_mtime >= source_mtime:
+                try:
+                    with open(self.subtitle_check_report_file, 'r', encoding='utf-8') as f:
+                        report = json.load(f)
+                    summary = report.get('summary', {})
+                    status = summary.get('status', 'unknown')
+                    score = summary.get('score', '?')
+                    if status == 'fail':
+                        print(f"✗ Istniejący raport AI Subtitler Checkera ma status FAIL (score: {score}).")
+                        print(f"  Raport: {self.subtitle_check_report_file}")
+                        print("  Użyj --force-subtitle-checker po poprawkach albo --skip-subtitle-checker, aby pominąć.")
+                        return False
+                    print(f"  Raport AI Subtitler Checkera aktualny: {status.upper()} (score: {score}). Pomijam.")
+                    return True
+                except Exception:
+                    print("  Nie udało się odczytać istniejącego raportu checkera. Uruchamiam ponownie.")
+
+        print(f"  Sprawdzane audio: {audio_file.name}")
+        cmd = [
+            'python', str(self.script_dir / 'subtitler_checker.py'),
+            '--audio', str(audio_file),
+            '--transcript', str(self.transcript_file),
+            '--report', str(self.subtitle_check_report_file),
+        ]
+        if self.auto_fix_subtitles:
+            cmd.append('--fix')
+
+        return self.run_command(cmd, "3️⃣  AI Subtitler Checker")
     
     def analyze_virals(self) -> bool:
-        """Krok 3: Przeanalizuj i znajdź viralowe momenty."""
+        """Krok 4: Przeanalizuj i znajdź viralowe momenty."""
         if not self.transcript_file.exists():
             print(f"✗ Plik transkrypcji nie istnieje: {self.transcript_file}")
             return False
@@ -285,10 +340,10 @@ class WorkflowManager:
             '--save-json', str(self.windows_file),
         ]
         
-        return self.run_command(cmd, "3️⃣  Analiza viralowych momentów")
+        return self.run_command(cmd, "4️⃣  Analiza viralowych momentów")
     
     def cut_segments(self) -> bool:
-        """Krok 4: Wytnij segmenty z wideo."""
+        """Krok 5: Wytnij segmenty z wideo."""
         if not self.windows_file.exists():
             print(f"✗ Plik okien nie istnieje: {self.windows_file}")
             return False
@@ -307,10 +362,10 @@ class WorkflowManager:
             '--output-dir', str(self.cuts_raw_dir),
         ]
         
-        return self.run_command(cmd, "4️⃣  Wycinanie segmentów")
+        return self.run_command(cmd, "5️⃣  Wycinanie segmentów")
     
     def add_subtitles(self) -> bool:
-        """Krok 5: Dodaj napisy na wycinki."""
+        """Krok 6: Dodaj napisy na wycinki."""
         if not self.transcript_file.exists():
             print(f"✗ Plik transkrypcji nie istnieje: {self.transcript_file}")
             return False
@@ -323,7 +378,7 @@ class WorkflowManager:
             '--output-subs', str(self.cuts_subs_dir),
         ]
         
-        return self.run_command(cmd, "5️⃣  Dodawanie napisów")
+        return self.run_command(cmd, "6️⃣  Dodawanie napisów")
     
     def cleanup_input(self):
         """Usuń ciężkie pliki wideo z input/."""
@@ -388,6 +443,8 @@ class WorkflowManager:
         print("="*60)
         print(f"URL: {self.url}")
         print(f"Skip Download: {'Tak' if self.skip_download else 'Nie'}")
+        print(f"Skip Subtitle Checker: {'Tak' if self.skip_subtitle_checker else 'Nie'}")
+        print(f"Auto Fix Subtitles: {'Tak' if self.auto_fix_subtitles else 'Nie'}")
         print(f"Cleanup: {'Tak' if self.cleanup else 'Nie'}")
         print()
         
@@ -417,6 +474,11 @@ class WorkflowManager:
                         steps.append((self.download_content, "Pobieranie"))
                     if not has_transcript:
                         steps.append((self.transcribe_podcast, "Transkrypcja"))
+
+            if self.skip_subtitle_checker:
+                print("  Pomijam AI Subtitler Checker (--skip-subtitle-checker).")
+            else:
+                steps.append((self.check_subtitles, "AI Subtitler Checker"))
 
             steps.extend([
                 (self.analyze_virals, "Analiza"),
@@ -450,13 +512,14 @@ class WorkflowManager:
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Orchstracja workflow: download → transkrypcja → analiza → cutting → napisy',
+        description='Orkiestracja workflow: download → transkrypcja → checker → analiza → cutting → napisy',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Przykłady:
   python manager.py --url "https://www.youtube.com/watch?v=..."
   python manager.py --url "..." --cleanup
   python manager.py --url "..." --skip-download  (do testowania, pomiń pobieranie)
+  python manager.py --url "..." --skip-subtitle-checker  (debug bez checkera)
         '''
     )
     
@@ -477,6 +540,24 @@ Przykłady:
         action='store_true',
         help='Pomiń pobieranie i transkrypcję (testowanie)',
     )
+
+    parser.add_argument(
+        '--skip-subtitle-checker',
+        action='store_true',
+        help='Pomiń AI Subtitler Checker',
+    )
+
+    parser.add_argument(
+        '--force-subtitle-checker',
+        action='store_true',
+        help='Uruchom AI Subtitler Checker nawet jeśli raport jest aktualny',
+    )
+
+    parser.add_argument(
+        '--auto-fix-subtitles',
+        action='store_true',
+        help='Automatycznie napraw wykryte błędy w transkrypcji',
+    )
     
     return parser.parse_args()
 
@@ -488,6 +569,9 @@ def main():
         url=args.url,
         cleanup=args.cleanup,
         skip_download=args.skip_download,
+        skip_subtitle_checker=args.skip_subtitle_checker,
+        force_subtitle_checker=args.force_subtitle_checker,
+        auto_fix_subtitles=args.auto_fix_subtitles,
     )
     
     manager.run()
