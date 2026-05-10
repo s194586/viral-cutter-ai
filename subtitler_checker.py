@@ -27,20 +27,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from gemini_transport import (
+    bootstrap_ssl_certificates,
+    generate_file_text_with_transport,
+    generate_text_with_transport,
+    genai,
+    get_api_key,
+)
+
 try:
     from dotenv import load_dotenv
 except Exception:
     load_dotenv = None
-
-try:
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=FutureWarning)
-        import google.generativeai as genai
-except Exception:
-    try:
-        import google.genai as genai
-    except Exception:
-        genai = None
 
 
 WORD_RE = re.compile(r"[0-9A-Za-zÀ-žąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+", re.UNICODE)
@@ -49,7 +47,6 @@ ARTIFACT_RE = re.compile(
     r"brak dźwięku|w załączonym audio)",
     re.IGNORECASE,
 )
-RETRY_DELAYS_SECONDS = (5, 10, 20)
 COMMON_NAMES = {
     "adam",
     "ania",
@@ -667,16 +664,14 @@ def extract_json_object(text: str) -> Dict[str, Any]:
 
 
 def configure_gemini(api_key: str) -> None:
-    if genai is None:
-        raise RuntimeError("google-generativeai nie jest zainstalowane.")
-    if hasattr(genai, "configure"):
-        genai.configure(api_key=api_key)
+    bootstrap_ssl_certificates(quiet=True)
 
 
 def ask_gemini_to_check_sample(
     sample_path: Path,
     expected_text: str,
     *,
+    api_key: str,
     model_name: str,
     max_retries: int = 3,
 ) -> Dict[str, Any]:
@@ -692,17 +687,16 @@ def ask_gemini_to_check_sample(
         "\"heard_text\" string, \"hallucinated_words\" array, \"missing_words\" array, \"notes\" string."
     )
 
-    uploaded = upload_file_with_backoff(sample_path, "Gemini sample upload", max_retries=max_retries)
-    model = genai.GenerativeModel(model_name)
-    result = generate_content_with_backoff(
-        model,
-        [uploaded, prompt],
+    text = generate_file_text_with_transport(
+        sample_path,
+        prompt,
+        model_name,
+        api_key,
         "Gemini audio subtitle check",
+        mime_type="audio/mpeg",
+        response_mime_type="application/json",
         max_retries=max_retries,
     )
-    text = getattr(result, "text", None)
-    if not text and hasattr(result, "candidates") and result.candidates:
-        text = str(result.candidates[0])
     parsed = extract_json_object(text or "")
     return normalize_ai_result(parsed)
 
@@ -721,10 +715,14 @@ def retranscribe_window(audio_path: Path, start: float, end: float, api_key: str
             "Nie dodawaj znaczków czasowych ani innych metadanych."
         )
 
-        uploaded = upload_file_with_backoff(sample_path, "Gemini retranscription upload")
-        model = genai.GenerativeModel(model_name)
-        result = generate_content_with_backoff(model, [uploaded, prompt], "Gemini retranscription")
-        text = getattr(result, "text", None)
+        text = generate_file_text_with_transport(
+            sample_path,
+            prompt,
+            model_name,
+            api_key,
+            "Gemini retranscription",
+            mime_type="audio/mpeg",
+        )
         if text:
             return text.strip()
     return None
@@ -1015,9 +1013,8 @@ def normalize_logic_result(result: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def verify_with_ai(text: str, *, model_name: str, max_retries: int = 3) -> Dict[str, Any]:
+def verify_with_ai(text: str, *, api_key: str, model_name: str, max_retries: int = 3) -> Dict[str, Any]:
     """Sprawdza, czy tekst brzmi naturalnie i czy nie wymaga korekty językowej."""
-    model = genai.GenerativeModel(model_name)
     prompt = (
         "Czy to zdanie brzmi naturalnie i czy nie zawiera błędów gramatycznych/kontekstowych?\n\n"
         f"TEKST:\n{text}\n\n"
@@ -1027,15 +1024,14 @@ def verify_with_ai(text: str, *, model_name: str, max_retries: int = 3) -> Dict[
         "Poprawiaj tylko oczywiste literówki, interpunkcję, wielkość liter i błędy gramatyczne. "
         "Nie zmieniaj sensu wypowiedzi."
     )
-    result = generate_content_with_backoff(
-        model,
-        [prompt],
+    response_text = generate_text_with_transport(
+        prompt,
+        model_name,
+        api_key,
         "Gemini logic check",
+        response_mime_type="application/json",
         max_retries=max_retries,
     )
-    response_text = getattr(result, "text", None)
-    if not response_text and hasattr(result, "candidates") and result.candidates:
-        response_text = str(result.candidates[0])
     return normalize_logic_result(extract_json_object(response_text or ""))
 
 
@@ -1046,7 +1042,6 @@ def run_ai_samples(
     api_key: str,
     model_name: str,
 ) -> List[Dict[str, Any]]:
-    configure_gemini(api_key)
     results = []
     with tempfile.TemporaryDirectory(prefix="subtitler_check_") as tmpdir:
         tmpdir_path = Path(tmpdir)
@@ -1061,9 +1056,10 @@ def run_ai_samples(
                 ai_result = ask_gemini_to_check_sample(
                     sample_path,
                     window["expected_text"],
+                    api_key=api_key,
                     model_name=model_name,
                 )
-                logic_result = verify_with_ai(window["expected_text"], model_name=model_name)
+                logic_result = verify_with_ai(window["expected_text"], api_key=api_key, model_name=model_name)
                 window_result = dict(window)
                 window_result.update(ai_result)
                 window_result["logic_check"] = logic_result
@@ -1218,6 +1214,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     args = parse_args()
     audio_path = Path(args.audio)
     transcript_path = Path(args.transcript)
@@ -1227,6 +1227,7 @@ def main() -> None:
         dotenv_path = Path(__file__).parent / ".env"
         if dotenv_path.exists():
             load_dotenv(dotenv_path)
+    bootstrap_ssl_certificates()
 
     if not audio_path.exists():
         print(f"✗ Plik audio nie istnieje: {audio_path}", file=sys.stderr)
@@ -1261,12 +1262,12 @@ def main() -> None:
 
     sample_results: List[Dict[str, Any]] = []
     ai_status = "skipped"
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY") or os.environ.get("API_KEY")
+    api_key = get_api_key()
 
     if args.skip_ai or args.max_samples <= 0:
         ai_status = "skipped"
         print("  AI próbki: pominięte (--skip-ai albo --max-samples=0)")
-    elif genai is None:
+    elif False and genai is None:
         ai_status = "unavailable"
         message = "google-generativeai nie jest zainstalowane, więc pomijam próbki AI."
         add_issue(issues, "warning", "AI_UNAVAILABLE", message)

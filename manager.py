@@ -22,12 +22,55 @@ Workflow:
 import argparse
 import json
 import os
+import ssl
 import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
 import shutil
 import time
+
+os.environ["UV_NATIVE_TLS"] = "1"
+
+try:
+    import certifi
+except Exception as certifi_import_error:
+    certifi = None
+    CERTIFI_IMPORT_ERROR = certifi_import_error
+else:
+    CERTIFI_IMPORT_ERROR = None
+
+try:
+    from dotenv import load_dotenv
+except Exception:
+    load_dotenv = None
+
+
+SSL_CERT_ENV_VARS = (
+    'SSL_CERT_FILE',
+    'REQUESTS_CA_BUNDLE',
+    'CURL_CA_BUNDLE',
+    'GRPC_DEFAULT_SSL_ROOTS_FILE_PATH',
+)
+
+
+def bootstrap_ssl_certificates(quiet: bool = False, allow_insecure_fallback: bool = False):
+    cert_path = None
+    if certifi is None:
+        if not quiet:
+            print("  Warning: certifi is not installed. Run `uv add certifi` to install the CA bundle.")
+    else:
+        cert_path = certifi.where()
+        for env_name in SSL_CERT_ENV_VARS:
+            os.environ[env_name] = cert_path
+
+    if allow_insecure_fallback:
+        ssl._create_default_https_context = ssl._create_unverified_context
+        os.environ['PYTHONHTTPSVERIFY'] = '0'
+    elif 'PYTHONHTTPSVERIFY' in os.environ:
+        os.environ.pop('PYTHONHTTPSVERIFY', None)
+
+    return cert_path
 
 try:
     from tqdm import tqdm
@@ -68,10 +111,11 @@ class WorkflowManager:
     
     def __init__(
         self,
-        url: str,
+        url: Optional[str],
         cleanup: bool = False,
         skip_download: bool = False,
         skip_subtitle_checker: bool = False,
+        skip_smart_context: bool = False,
         force_subtitle_checker: bool = False,
         auto_fix_subtitles: bool = True,
     ):
@@ -79,6 +123,7 @@ class WorkflowManager:
         self.cleanup = cleanup
         self.skip_download = skip_download
         self.skip_subtitle_checker = skip_subtitle_checker
+        self.skip_smart_context = skip_smart_context
         self.force_subtitle_checker = force_subtitle_checker
         self.auto_fix_subtitles = auto_fix_subtitles
         self.script_dir = Path(__file__).parent
@@ -97,6 +142,205 @@ class WorkflowManager:
         self.cutting_logic_file = self.metadata_dir / 'cutting_logic.json'
         self.heatmap_file = self.metadata_dir / 'heatmap.json'
         self.windows_file = self.script_dir / 'top_windows.json'
+        self.gemini_transport = os.environ.get('GEMINI_TRANSPORT', '').strip().lower()
+
+    def build_subprocess_env(self):
+        env = os.environ.copy()
+        env['UV_NATIVE_TLS'] = '1'
+        env.setdefault('PYTHONUTF8', '1')
+        env.setdefault('PYTHONIOENCODING', 'utf-8')
+        return env
+
+    def cleanup_previous_run(self):
+        """Czyści artefakty poprzedniego runa, ale zostawia pliki źródłowe i konfiguracyjne."""
+        print("\n" + "=" * 60)
+        print("🧹 Czyszczenie poprzedniego runa")
+        print("=" * 60)
+
+        deleted_count = 0
+        for directory in (self.cuts_raw_dir, self.cuts_subs_dir):
+            for file_path in directory.glob("*"):
+                if not file_path.is_file():
+                    continue
+                try:
+                    file_path.unlink()
+                    print(f"  ✓ Usunięto: {file_path.relative_to(self.script_dir)}")
+                    deleted_count += 1
+                except Exception as exc:
+                    print(f"  ✗ Nie udało się usunąć {file_path.name}: {exc}")
+
+        metadata_keep = {"heatmap.json"}
+        metadata_keep_suffixes = (".info.json", ".heatmap.json", ".md", ".txt", ".gitkeep")
+        for file_path in self.metadata_dir.glob("*"):
+            if not file_path.is_file():
+                continue
+            if file_path.name in metadata_keep or file_path.name.endswith(metadata_keep_suffixes):
+                continue
+            try:
+                file_path.unlink()
+                print(f"  ✓ Usunięto: {file_path.relative_to(self.script_dir)}")
+                deleted_count += 1
+            except Exception as exc:
+                print(f"  ✗ Nie udało się usunąć {file_path.name}: {exc}")
+
+        if self.windows_file.exists():
+            try:
+                self.windows_file.unlink()
+                print(f"  ✓ Usunięto: {self.windows_file.relative_to(self.script_dir)}")
+                deleted_count += 1
+            except Exception as exc:
+                print(f"  ✗ Nie udało się usunąć {self.windows_file.name}: {exc}")
+
+        if deleted_count == 0:
+            print("  (Brak starych artefaktów do usunięcia)")
+
+    def get_gemini_api_key(self) -> Optional[str]:
+        return os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY') or os.environ.get('API_KEY')
+
+    def is_ssl_error(self, output: str) -> bool:
+        message = (output or '').lower()
+        return any(
+            token in message
+            for token in (
+                'certificate_verify_failed',
+                'ssl handshake failed',
+                'openssl_uplink',
+                'tls',
+                'schannel',
+                'crypt_e_no_revocation_check',
+                'unable to get local issuer certificate',
+            )
+        )
+
+    def build_gemini_probe_script(self, allow_insecure_fallback: bool = False) -> str:
+        insecure_block = ""
+        if allow_insecure_fallback:
+            insecure_block = (
+                "import ssl\n"
+                "ssl._create_default_https_context = ssl._create_unverified_context\n"
+                "os.environ['PYTHONHTTPSVERIFY'] = '0'\n"
+            )
+
+        return (
+            "import json\n"
+            "import os\n"
+            "import urllib.request\n"
+            "from pathlib import Path\n"
+            "try:\n"
+            "    import certifi\n"
+            "except Exception:\n"
+            "    certifi = None\n"
+            "for env_name in ('SSL_CERT_FILE', 'REQUESTS_CA_BUNDLE', 'CURL_CA_BUNDLE', 'GRPC_DEFAULT_SSL_ROOTS_FILE_PATH'):\n"
+            "    if certifi is not None:\n"
+            "        os.environ[env_name] = certifi.where()\n"
+            f"{insecure_block}"
+            "try:\n"
+            "    from dotenv import load_dotenv\n"
+            "except Exception:\n"
+            "    load_dotenv = None\n"
+            "if load_dotenv is not None:\n"
+            "    dotenv_path = Path.cwd() / '.env'\n"
+            "    if dotenv_path.exists():\n"
+            "        load_dotenv(dotenv_path)\n"
+            "api_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY') or os.environ.get('API_KEY')\n"
+            "if not api_key:\n"
+            "    raise SystemExit('Missing Gemini API key.')\n"
+            "url = f'https://generativelanguage.googleapis.com/v1beta/models?key={api_key}&pageSize=1'\n"
+            "with urllib.request.urlopen(url, timeout=20) as response:\n"
+            "    payload = json.loads(response.read().decode('utf-8'))\n"
+            "print(payload.get('models', [{}])[0].get('name', ''))\n"
+        )
+
+    def run_gemini_probe(self, allow_insecure_fallback: bool = False) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            [sys.executable, '-c', self.build_gemini_probe_script(allow_insecure_fallback)],
+            capture_output=True,
+            text=True,
+            cwd=self.script_dir,
+            env=self.build_subprocess_env(),
+        )
+
+    def test_gemini_via_curl(self, api_key: str) -> tuple[bool, str]:
+        curl_binary = shutil.which('curl.exe') or shutil.which('curl')
+        if not curl_binary:
+            return False, "curl is not available in PATH."
+
+        cmd = [
+            curl_binary,
+            '--silent',
+            '--show-error',
+            '--location',
+            '--ssl-no-revoke',
+            '--max-time',
+            '30',
+            f'https://generativelanguage.googleapis.com/v1beta/models?key={api_key}&pageSize=1',
+        ]
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            cwd=self.script_dir,
+            env=self.build_subprocess_env(),
+        )
+        output = (result.stdout or '') + (result.stderr or '')
+        if result.returncode != 0:
+            return False, output.strip()
+
+        try:
+            payload = json.loads(result.stdout or '{}')
+            model_name = payload.get('models', [{}])[0].get('name', '')
+            return True, model_name or 'Gemini model list OK'
+        except json.JSONDecodeError:
+            return False, output.strip()
+
+    def verify_gemini_connection(self):
+        if self.skip_smart_context:
+            print("  Pomijam test Gemini, bo włączono --skip-smart-context.")
+            return
+
+        api_key = self.get_gemini_api_key()
+        if not api_key:
+            raise ManagerError("Brak klucza Gemini w .env (GOOGLE_API_KEY / GEMINI_API_KEY / API_KEY).")
+
+        print("🔐 Testuję połączenie SSL z Gemini...")
+        bootstrap_ssl_certificates()
+
+        probe = self.run_gemini_probe()
+        if probe.returncode == 0:
+            model_name = (probe.stdout or '').strip() or 'unknown'
+            self.gemini_transport = self.gemini_transport or 'sdk'
+            os.environ['GEMINI_TRANSPORT'] = self.gemini_transport
+            print(f"  ✓ Gemini reachable via Python SSL ({model_name})")
+            return
+
+        probe_output = ((probe.stdout or '') + "\n" + (probe.stderr or '')).strip()
+        if self.is_ssl_error(probe_output):
+            print("  Warning: Python SSL nadal odrzuca certyfikat Gemini. Próbuję trybu debugowego bez weryfikacji certyfikatu...")
+            bootstrap_ssl_certificates(quiet=True, allow_insecure_fallback=True)
+            insecure_probe = self.run_gemini_probe(allow_insecure_fallback=True)
+            if insecure_probe.returncode == 0:
+                model_name = (insecure_probe.stdout or '').strip() or 'unknown'
+                self.gemini_transport = 'sdk'
+                os.environ['GEMINI_TRANSPORT'] = self.gemini_transport
+                print(f"  Warning: Gemini działa tylko z debug SSL fallback ({model_name}).")
+                return
+
+            curl_ok, curl_message = self.test_gemini_via_curl(api_key)
+            if curl_ok:
+                self.gemini_transport = 'curl'
+                os.environ['GEMINI_TRANSPORT'] = 'curl'
+                os.environ['CURL_SSL_NO_REVOKE'] = '1'
+                print(f"  ✓ Gemini reachable via curl SSL fallback ({curl_message})")
+                return
+
+        diagnostics = probe_output or "Unknown Gemini SSL failure."
+        if certifi is None and CERTIFI_IMPORT_ERROR is not None:
+            diagnostics += f"\ncertifi import error: {CERTIFI_IMPORT_ERROR}"
+        raise ManagerError(
+            "Nie udało się zestawić połączenia z Gemini. "
+            "Sprawdź certyfikaty systemowe / proxy albo uruchom `uv add certifi`.\n"
+            f"Szczegóły:\n{diagnostics}"
+        )
 
     def verify_external_tools(self):
         """Sprawdza, czy narzędzia wymagane do obróbki audio/wideo są dostępne."""
@@ -138,7 +382,7 @@ class WorkflowManager:
         ]
 
         try:
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, env=self.build_subprocess_env())
             lines = [line for line in result.stdout.splitlines() if line.strip()]
             return len(lines)
         except subprocess.CalledProcessError:
@@ -167,7 +411,7 @@ class WorkflowManager:
         ]
 
         try:
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=self.build_subprocess_env())
             print(f"  ✓ Audio wyciągnięte: {audio_output.name}")
             return audio_output
         except subprocess.CalledProcessError as e:
@@ -243,7 +487,7 @@ class WorkflowManager:
             print(f"{'='*60}")
             
             try:
-                result = subprocess.run(cmd, check=True)
+                subprocess.run(cmd, check=True, env=self.build_subprocess_env())
                 return True
             except subprocess.CalledProcessError as e:
                 print(f"✗ Błąd: {description} zawiódł")
@@ -262,6 +506,9 @@ class WorkflowManager:
     
     def download_content(self) -> bool:
         """Krok 1: Pobierz wideo z YouTube."""
+        if not self.url:
+            print("✗ Nie podano URL do pobrania.")
+            return False
         cmd = [
             sys.executable, str(self.script_dir / 'download_content.py'),
             self.url,
@@ -352,6 +599,8 @@ class WorkflowManager:
             '--save-json', str(self.windows_file),
             '--cutting-log', str(self.cutting_logic_file),
         ]
+        if self.skip_smart_context:
+            cmd.append('--skip-smart-context')
         
         return self.run_command(cmd, "4️⃣  Analiza viralowych momentów")
     
@@ -449,6 +698,27 @@ class WorkflowManager:
         
         print()
         print(f"  📁 Katalog output: {self.cuts_subs_dir.resolve()}")
+        refinement_status = "UNKNOWN"
+        transport = (self.gemini_transport or os.environ.get('GEMINI_TRANSPORT') or 'unknown').upper()
+        clip_count = len(subs_files)
+        requested = 0
+        refined = 0
+        fallback = 0
+        if self.cutting_logic_file.exists():
+            try:
+                with open(self.cutting_logic_file, 'r', encoding='utf-8') as file_handle:
+                    cutting_log = json.load(file_handle)
+                requested = int(cutting_log.get('clips_requested') or 0)
+                refined = int(cutting_log.get('clips_refined_with_ai') or 0)
+                fallback = int(cutting_log.get('clips_with_local_fallback') or 0)
+                log_transport = str(cutting_log.get('ai_transport') or '').strip()
+                if log_transport:
+                    transport = log_transport.upper()
+                refinement_status = 'FULL SUCCESS' if requested and refined == requested and fallback == 0 else 'PARTIAL'
+            except Exception:
+                refinement_status = 'UNKNOWN'
+        print(f"  Wygenerowano {clip_count} klipów, AI refinement: {refinement_status} (Transport: {transport})")
+        print(f"  AI sukcesy: {refined}/{requested} | Fallbacki: {fallback}")
         print()
     
     def run(self):
@@ -456,9 +726,10 @@ class WorkflowManager:
         print("\n" + "="*60)
         print("🚀 VIRAL CUTTER AI — WORKFLOW MANAGER")
         print("="*60)
-        print(f"URL: {self.url}")
+        print(f"URL: {self.url if self.url else '(local input mode)'}")
         print(f"Skip Download: {'Tak' if self.skip_download else 'Nie'}")
         print(f"Skip Subtitle Checker: {'Tak' if self.skip_subtitle_checker else 'Nie'}")
+        print(f"Skip Smart Context: {'Tak' if self.skip_smart_context else 'Nie'}")
         print(f"Auto Fix Subtitles: {'Tak' if self.auto_fix_subtitles else 'Nie'}")
         print(f"Cleanup: {'Tak' if self.cleanup else 'Nie'}")
         print()
@@ -467,6 +738,8 @@ class WorkflowManager:
             # Przygotowanie
             self.verify_external_tools()
             self.ensure_directories()
+            self.cleanup_previous_run()
+            self.verify_gemini_connection()
             
             # Workflow
             steps = []
@@ -487,6 +760,8 @@ class WorkflowManager:
                         steps.append((self.transcribe_podcast, "Transkrypcja"))
                 else:
                     if not has_video:
+                        if not self.url:
+                            raise ManagerError("Brak pliku wideo w input/ i nie podano --url do pobrania.")
                         steps.append((self.download_content, "Pobieranie"))
                     if not has_transcript:
                         steps.append((self.transcribe_podcast, "Transkrypcja"))
@@ -541,8 +816,8 @@ Przykłady:
     
     parser.add_argument(
         '--url',
-        required=True,
-        help='Adres URL do wideo na YouTube',
+        required=False,
+        help='Adres URL do wideo na YouTube. Opcjonalny, jesli masz juz pliki w input/.',
     )
     
     parser.add_argument(
@@ -569,6 +844,12 @@ Przykłady:
         help='Uruchom AI Subtitler Checker nawet jeśli raport jest aktualny',
     )
 
+    parser.add_argument(
+        '--skip-smart-context',
+        action='store_true',
+        help='Pomiń analizę Gemini i użyj lokalnych granic z heatmapy',
+    )
+
     parser.set_defaults(auto_fix_subtitles=True)
     parser.add_argument(
         '--auto-fix-subtitles',
@@ -586,6 +867,14 @@ Przykłady:
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    if load_dotenv is not None:
+        dotenv_path = Path(__file__).parent / '.env'
+        if dotenv_path.exists():
+            load_dotenv(dotenv_path)
     args = parse_args()
     
     manager = WorkflowManager(
@@ -593,6 +882,7 @@ def main():
         cleanup=args.cleanup,
         skip_download=args.skip_download,
         skip_subtitle_checker=args.skip_subtitle_checker,
+        skip_smart_context=args.skip_smart_context,
         force_subtitle_checker=args.force_subtitle_checker,
         auto_fix_subtitles=args.auto_fix_subtitles,
     )

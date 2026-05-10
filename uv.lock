@@ -543,6 +543,7 @@ name = "viral-cutter-ai"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "certifi" },
     { name = "ffmpeg-python" },
     { name = "google-generativeai" },
     { name = "python-dotenv" },
@@ -551,6 +552,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "certifi", specifier = ">=2026.4.22" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
     { name = "google-generativeai", specifier = ">=0.8.6" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
