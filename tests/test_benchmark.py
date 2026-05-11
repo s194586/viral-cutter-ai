@@ -8,6 +8,7 @@ from benchmark import (
     BenchmarkCase,
     count_overlapping_windows,
     load_cases,
+    summarize_transcript_metrics,
     summarize_selection_metrics,
     validate_case_inputs,
     write_human_review_template,
@@ -51,6 +52,32 @@ class BenchmarkHelpersTests(unittest.TestCase):
         self.assertEqual(summary["score_distribution"]["max"], 91.2)
         self.assertEqual(summary["selection_reason_counts"]["strong heatmap support"], 2)
         self.assertGreater(summary["temporal_metrics"]["temporal_coverage_ratio"], 0.0)
+
+    def test_summarize_transcript_metrics_keeps_diarization_diagnostics(self):
+        segments = [
+            {"start": 0.0, "end": 2.0, "text": "one", "speaker": "Speaker 0"},
+            {"start": 2.0, "end": 4.0, "text": "two", "speaker": "Speaker 0"},
+            {"start": 4.0, "end": 6.0, "text": "three", "speaker": "Speaker 1"},
+        ]
+        metadata = {
+            "speaker_count": 2,
+            "diarization_status": "applied_multi_speaker",
+            "raw_cluster_count": 4,
+            "final_speaker_count": 2,
+            "single_speaker_likelihood": 0.32,
+            "multi_speaker_evidence": 0.71,
+            "clusters_merged": 2,
+            "tiny_clusters_removed": 2,
+            "decision_reason": "kept_multi_speaker_clusters",
+        }
+        summary = summarize_transcript_metrics(
+            segments,
+            metadata,
+            expected_speaker_mode="multi",
+        )
+        self.assertEqual(summary["raw_cluster_count"], 4)
+        self.assertEqual(summary["final_speaker_count"], 2)
+        self.assertEqual(summary["decision_reason"], "kept_multi_speaker_clusters")
 
     def test_write_outputs_create_files(self):
         rows = [

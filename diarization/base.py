@@ -12,7 +12,14 @@ class DiarizationConfig:
     sample_rate: int = 16000
     max_speakers: int = 4
     min_segment_seconds: float = 0.35
-    similarity_threshold: float = 0.8
+    similarity_threshold: float = 0.985
+    merge_similarity_threshold: float = 0.95
+    single_speaker_similarity_floor: float = 0.955
+    min_cluster_share: float = 0.08
+    min_cluster_seconds: float = 18.0
+    min_cluster_segments: int = 6
+    multi_speaker_min_share: float = 0.18
+    single_speaker_likelihood_threshold: float = 0.58
 
 
 @dataclass

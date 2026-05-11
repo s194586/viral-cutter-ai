@@ -597,7 +597,7 @@ def summarize_transcript_metrics(
     if expected_speaker_mode == "multi" and dominant_speaker_ratio >= 0.9:
         flags.append("dominant_speaker_ratio_very_high_for_multi_speaker_case")
 
-    return {
+    metrics = {
         "segment_count": len(transcript_segments),
         "speaker_count": speaker_count,
         "speaker_distribution": dict(sorted(speaker_distribution.items())),
@@ -610,6 +610,25 @@ def summarize_transcript_metrics(
         "pipeline_seconds": transcript_metadata.get("pipeline_seconds"),
         "flags": flags,
     }
+    for key in (
+        "raw_cluster_count",
+        "final_speaker_count",
+        "single_speaker_likelihood",
+        "multi_speaker_evidence",
+        "clusters_merged",
+        "tiny_clusters_removed",
+        "decision_reason",
+        "adjacent_similarity_mean",
+        "top_cluster_similarity",
+        "stable_cluster_count",
+        "alternating_blocks",
+        "raw_cluster_distribution",
+        "raw_cluster_duration_share",
+        "cluster_label_distribution",
+    ):
+        if key in transcript_metadata:
+            metrics[key] = transcript_metadata.get(key)
+    return metrics
 
 
 def summarize_selection_metrics(
@@ -1209,6 +1228,7 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
     podcast_correct = 0
     tutorial_correct = 0
     single_speaker_oversegmented = 0
+    multi_speaker_flattened = 0
     commentary_like_cases = commentary_cases or generic_cases
     for case in commentary_like_cases:
         auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
@@ -1231,10 +1251,13 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
             if auto.get("classification", {}).get("detected_content_type") == "tutorial":
                 tutorial_correct += 1
     for case in completed_cases:
+        flags = case.get("transcript_metrics", {}).get("flags") or []
         if case.get("expected_speaker_mode") == "single":
-            flags = case.get("transcript_metrics", {}).get("flags") or []
             if "expected_single_speaker_but_detected_many" in flags:
                 single_speaker_oversegmented += 1
+        if case.get("expected_speaker_mode") == "multi":
+            if "expected_multi_speaker_but_detected_single" in flags:
+                multi_speaker_flattened += 1
 
     lines.append("## Key Observations")
     lines.append("")
@@ -1254,10 +1277,12 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
         lines.append(
             f"- True tutorial cases classified correctly as `tutorial`: `{tutorial_correct}/{len(tutorial_cases)}`."
         )
-    if single_speaker_oversegmented:
-        lines.append(
-            f"- Expected single-speaker materials flagged as over-segmented by diarization: `{single_speaker_oversegmented}`."
-        )
+    lines.append(
+        f"- Expected single-speaker materials flagged as over-segmented by diarization: `{single_speaker_oversegmented}`."
+    )
+    lines.append(
+        f"- Expected multi-speaker materials flattened to a single speaker: `{multi_speaker_flattened}`."
+    )
     lines.append("")
 
     for case in report_payload["cases"]:
@@ -1283,6 +1308,24 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
         lines.append(f"- Dominant speaker ratio: `{transcript_metrics.get('dominant_speaker_ratio')}`")
         lines.append(f"- Diarization status: `{transcript_metrics.get('diarization_status')}`")
         lines.append(f"- Fallback used: `{transcript_metrics.get('diarization_used_fallback')}`")
+        if transcript_metrics.get("raw_cluster_count") is not None:
+            lines.append(f"- Raw cluster count: `{transcript_metrics.get('raw_cluster_count')}`")
+        if transcript_metrics.get("final_speaker_count") is not None:
+            lines.append(f"- Final speaker count: `{transcript_metrics.get('final_speaker_count')}`")
+        if transcript_metrics.get("single_speaker_likelihood") is not None:
+            lines.append(
+                f"- Single-speaker likelihood: `{transcript_metrics.get('single_speaker_likelihood')}`"
+            )
+        if transcript_metrics.get("multi_speaker_evidence") is not None:
+            lines.append(
+                f"- Multi-speaker evidence: `{transcript_metrics.get('multi_speaker_evidence')}`"
+            )
+        if transcript_metrics.get("clusters_merged") is not None:
+            lines.append(f"- Clusters merged: `{transcript_metrics.get('clusters_merged')}`")
+        if transcript_metrics.get("tiny_clusters_removed") is not None:
+            lines.append(f"- Tiny clusters removed: `{transcript_metrics.get('tiny_clusters_removed')}`")
+        if transcript_metrics.get("decision_reason"):
+            lines.append(f"- Decision reason: `{transcript_metrics.get('decision_reason')}`")
         if transcript_metrics.get("flags"):
             lines.append(f"- Diagnostic flags: `{', '.join(transcript_metrics['flags'])}`")
         lines.append("")

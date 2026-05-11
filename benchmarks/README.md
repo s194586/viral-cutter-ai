@@ -8,6 +8,8 @@
 - strategy routing differences between `auto`, manual override and `generic`
 - top-clip overlap and diversity
 - transcript / diarization diagnostics
+  includes `raw_cluster_count`, `final_speaker_count`, `single_speaker_likelihood`,
+  `multi_speaker_evidence`, `clusters_merged`, `tiny_clusters_removed` and `decision_reason`
 - subtitle checker summary
 - rendering / face-tracking / zoom stats
 - human review placeholders for final clip judgment

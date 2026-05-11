@@ -75,8 +75,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--diarization-threshold",
         type=float,
-        default=0.8,
-        help="Cosine similarity threshold for the heuristic diarizer",
+        default=0.985,
+        help="Cosine similarity threshold for the heuristic diarizer (higher = more conservative speaker splits)",
     )
     return parser.parse_args()
 

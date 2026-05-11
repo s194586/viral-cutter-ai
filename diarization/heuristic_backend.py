@@ -26,6 +26,16 @@ class _Cluster:
     indices: list[int]
 
 
+@dataclass
+class _ClusterSummary:
+    label: int
+    indices: list[int]
+    duration_seconds: float
+    segment_count: int
+    share: float
+    centroid: np.ndarray
+
+
 class HeuristicDiarizationBackend(DiarizationBackend):
     name = "heuristic_cluster"
 
@@ -62,10 +72,23 @@ class HeuristicDiarizationBackend(DiarizationBackend):
                         segments,
                         eligible_segments=len(feature_rows),
                         assigned_segments=0,
+                        raw_cluster_count=1 if len(feature_rows) else 0,
+                        final_speaker_count=1 if segments else 0,
+                        single_speaker_likelihood=1.0 if segments else 0.0,
+                        multi_speaker_evidence=0.0,
+                        clusters_merged=0,
+                        tiny_clusters_removed=0,
+                        decision_reason="insufficient_feature_segments",
                     ),
                 )
 
-            labels = self._cluster_features(feature_rows)
+            raw_labels = self._cluster_features(feature_rows)
+            labels, decision_metadata = self._refine_labels(
+                feature_rows,
+                raw_labels,
+                feature_indices,
+                segments,
+            )
             label_map = self._normalize_labels(labels, feature_indices)
 
             for segment_index, cluster_label in zip(feature_indices, labels):
@@ -85,6 +108,7 @@ class HeuristicDiarizationBackend(DiarizationBackend):
                     eligible_segments=len(feature_rows),
                     assigned_segments=len(feature_indices),
                     cluster_label_distribution=dict(sorted(Counter(labels).items())),
+                    **decision_metadata,
                 ),
             )
         except Exception as exc:
@@ -153,9 +177,7 @@ class HeuristicDiarizationBackend(DiarizationBackend):
         if not features:
             return np.zeros((0, 0), dtype=np.float32), indices
         matrix = np.vstack(features)
-        means = matrix.mean(axis=0, keepdims=True)
-        stds = matrix.std(axis=0, keepdims=True)
-        normalized = (matrix - means) / np.maximum(stds, EPSILON)
+        normalized = matrix / np.maximum(np.linalg.norm(matrix, axis=1, keepdims=True), EPSILON)
         return normalized.astype(np.float32), indices
 
     def _segment_features(
@@ -269,6 +291,347 @@ class HeuristicDiarizationBackend(DiarizationBackend):
                 labels[row_index] = int(np.argmax(similarities))
 
         return labels
+
+    def _refine_labels(
+        self,
+        feature_rows: np.ndarray,
+        raw_labels: list[int],
+        feature_indices: list[int],
+        segments: list[TranscriptSegment],
+    ) -> tuple[list[int], dict[str, Any]]:
+        if not raw_labels:
+            return [], {
+                "raw_cluster_count": 0,
+                "final_speaker_count": 0,
+                "single_speaker_likelihood": 1.0 if segments else 0.0,
+                "multi_speaker_evidence": 0.0,
+                "clusters_merged": 0,
+                "tiny_clusters_removed": 0,
+                "decision_reason": "no_clusters",
+            }
+
+        durations = [max(0.0, segments[index].end - segments[index].start) for index in feature_indices]
+        raw_cluster_count = len(set(raw_labels))
+        labels = list(raw_labels)
+        clusters_merged = 0
+        tiny_clusters_removed = 0
+
+        labels, merged_now, removed_now = self._merge_small_or_similar_clusters(
+            feature_rows,
+            labels,
+            durations,
+        )
+        clusters_merged += merged_now
+        tiny_clusters_removed += removed_now
+
+        raw_summaries = self._summarize_clusters(feature_rows, raw_labels, durations)
+        final_summaries = self._summarize_clusters(feature_rows, labels, durations)
+        adjacent_similarity_mean = self._adjacent_similarity_mean(feature_rows)
+        top_cluster_similarity = self._top_cluster_similarity(final_summaries)
+        stable_cluster_count = sum(
+            1
+            for summary in final_summaries
+            if summary.share >= self.config.multi_speaker_min_share
+        )
+        alternating_blocks = self._count_alternating_blocks(labels)
+        dominant_share = final_summaries[0].share if final_summaries else 1.0
+
+        single_speaker_likelihood = self._estimate_single_speaker_likelihood(
+            adjacent_similarity_mean=adjacent_similarity_mean,
+            top_cluster_similarity=top_cluster_similarity,
+            dominant_share=dominant_share,
+            stable_cluster_count=stable_cluster_count,
+            raw_cluster_count=raw_cluster_count,
+            final_summaries=final_summaries,
+            alternating_blocks=alternating_blocks,
+        )
+        multi_speaker_evidence = self._estimate_multi_speaker_evidence(
+            adjacent_similarity_mean=adjacent_similarity_mean,
+            top_cluster_similarity=top_cluster_similarity,
+            stable_cluster_count=stable_cluster_count,
+            final_summaries=final_summaries,
+            alternating_blocks=alternating_blocks,
+        )
+
+        decision_reason = "kept_multi_speaker_clusters"
+        if self._should_collapse_to_single(
+            single_speaker_likelihood=single_speaker_likelihood,
+            multi_speaker_evidence=multi_speaker_evidence,
+            top_cluster_similarity=top_cluster_similarity,
+            stable_cluster_count=stable_cluster_count,
+            final_summaries=final_summaries,
+        ):
+            labels = [0 for _ in labels]
+            final_summaries = self._summarize_clusters(feature_rows, labels, durations)
+            decision_reason = "collapsed_to_single_speaker_due_to_weak_multi_evidence"
+        else:
+            labels, merged_now = self._merge_residual_small_clusters(
+                feature_rows,
+                labels,
+                durations,
+            )
+            clusters_merged += merged_now
+            final_summaries = self._summarize_clusters(feature_rows, labels, durations)
+
+        diagnostics = {
+            "raw_cluster_count": raw_cluster_count,
+            "final_speaker_count": len(final_summaries),
+            "raw_cluster_distribution": {
+                f"Cluster {summary.label}": summary.segment_count for summary in raw_summaries
+            },
+            "raw_cluster_duration_share": {
+                f"Cluster {summary.label}": round(float(summary.share), 4) for summary in raw_summaries
+            },
+            "single_speaker_likelihood": round(float(single_speaker_likelihood), 4),
+            "multi_speaker_evidence": round(float(multi_speaker_evidence), 4),
+            "clusters_merged": int(clusters_merged),
+            "tiny_clusters_removed": int(tiny_clusters_removed),
+            "decision_reason": decision_reason,
+            "adjacent_similarity_mean": round(float(adjacent_similarity_mean), 4),
+            "top_cluster_similarity": round(float(top_cluster_similarity), 4),
+            "stable_cluster_count": int(stable_cluster_count),
+            "alternating_blocks": int(alternating_blocks),
+        }
+        return labels, diagnostics
+
+    def _merge_small_or_similar_clusters(
+        self,
+        feature_rows: np.ndarray,
+        labels: list[int],
+        durations: list[float],
+    ) -> tuple[list[int], int, int]:
+        if not labels:
+            return labels, 0, 0
+
+        merged = 0
+        removed = 0
+        working = list(labels)
+
+        while True:
+            summaries = self._summarize_clusters(feature_rows, working, durations)
+            if len(summaries) <= 1:
+                break
+
+            candidate = None
+            target = None
+            best_similarity = -1.0
+            for summary in reversed(summaries):
+                if not self._is_small_cluster(summary):
+                    continue
+                for other in summaries:
+                    if other.label == summary.label:
+                        continue
+                    similarity = self._cosine_similarity(summary.centroid, other.centroid)
+                    if similarity > best_similarity:
+                        best_similarity = similarity
+                        candidate = summary.label
+                        target = other.label
+            if candidate is None or target is None:
+                break
+
+            for index, label in enumerate(working):
+                if label == candidate:
+                    working[index] = target
+            merged += 1
+            if best_similarity >= self.config.merge_similarity_threshold:
+                removed += 1
+
+        return working, merged, removed
+
+    def _merge_residual_small_clusters(
+        self,
+        feature_rows: np.ndarray,
+        labels: list[int],
+        durations: list[float],
+    ) -> tuple[list[int], int]:
+        if not labels:
+            return labels, 0
+
+        working = list(labels)
+        merged = 0
+        while True:
+            summaries = self._summarize_clusters(feature_rows, working, durations)
+            dominant = summaries[0] if summaries else None
+            candidate = next(
+                (
+                    summary
+                    for summary in reversed(summaries)
+                    if dominant is not None
+                    and summary.label != dominant.label
+                    and summary.share < self.config.min_cluster_share
+                ),
+                None,
+            )
+            if candidate is None or dominant is None:
+                break
+            for index, label in enumerate(working):
+                if label == candidate.label:
+                    working[index] = dominant.label
+            merged += 1
+        return working, merged
+
+    def _summarize_clusters(
+        self,
+        feature_rows: np.ndarray,
+        labels: list[int],
+        durations: list[float],
+    ) -> list[_ClusterSummary]:
+        grouped: dict[int, list[int]] = {}
+        for row_index, label in enumerate(labels):
+            grouped.setdefault(int(label), []).append(row_index)
+        total_duration = sum(durations[index] for index in range(len(labels))) or float(len(labels)) or 1.0
+        summaries: list[_ClusterSummary] = []
+        for label, indices in grouped.items():
+            duration_seconds = sum(durations[index] for index in indices)
+            summaries.append(
+                _ClusterSummary(
+                    label=label,
+                    indices=indices,
+                    duration_seconds=duration_seconds,
+                    segment_count=len(indices),
+                    share=duration_seconds / total_duration,
+                    centroid=feature_rows[indices].mean(axis=0),
+                )
+            )
+        return sorted(
+            summaries,
+            key=lambda summary: (summary.share, summary.duration_seconds, summary.segment_count),
+            reverse=True,
+        )
+
+    def _is_small_cluster(self, summary: _ClusterSummary) -> bool:
+        return (
+            summary.share < self.config.min_cluster_share
+            or summary.duration_seconds < self.config.min_cluster_seconds
+            or summary.segment_count < self.config.min_cluster_segments
+        )
+
+    def _adjacent_similarity_mean(self, feature_rows: np.ndarray) -> float:
+        if len(feature_rows) < 2:
+            return 1.0
+        similarities = [
+            self._cosine_similarity(feature_rows[index], feature_rows[index + 1])
+            for index in range(len(feature_rows) - 1)
+        ]
+        return float(sum(similarities) / max(len(similarities), 1))
+
+    def _top_cluster_similarity(self, summaries: list[_ClusterSummary]) -> float:
+        if len(summaries) < 2:
+            return 1.0
+        top = summaries[:2]
+        return self._cosine_similarity(top[0].centroid, top[1].centroid)
+
+    def _count_alternating_blocks(self, labels: list[int]) -> int:
+        if not labels:
+            return 0
+        run_labels: list[int] = []
+        for label in labels:
+            if not run_labels or run_labels[-1] != label:
+                run_labels.append(label)
+        return max(0, len(run_labels) - 1)
+
+    def _estimate_single_speaker_likelihood(
+        self,
+        *,
+        adjacent_similarity_mean: float,
+        top_cluster_similarity: float,
+        dominant_share: float,
+        stable_cluster_count: int,
+        raw_cluster_count: int,
+        final_summaries: list[_ClusterSummary],
+        alternating_blocks: int,
+    ) -> float:
+        likelihood = 0.0
+        if adjacent_similarity_mean >= self.config.single_speaker_similarity_floor:
+            likelihood += 0.3
+        elif adjacent_similarity_mean >= self.config.single_speaker_similarity_floor - 0.02:
+            likelihood += 0.18
+
+        if top_cluster_similarity >= self.config.merge_similarity_threshold:
+            likelihood += 0.32
+        elif top_cluster_similarity >= self.config.merge_similarity_threshold - 0.03:
+            likelihood += 0.16
+
+        if dominant_share >= 0.7:
+            likelihood += 0.18
+        elif dominant_share >= 0.55:
+            likelihood += 0.08
+
+        if stable_cluster_count <= 1:
+            likelihood += 0.14
+        elif stable_cluster_count == 2 and top_cluster_similarity >= self.config.merge_similarity_threshold:
+            likelihood += 0.08
+
+        if raw_cluster_count > len(final_summaries):
+            likelihood += 0.08
+
+        if alternating_blocks >= 16:
+            likelihood -= 0.08
+        if stable_cluster_count >= 3:
+            likelihood -= 0.12
+
+        return max(0.0, min(1.0, likelihood))
+
+    def _estimate_multi_speaker_evidence(
+        self,
+        *,
+        adjacent_similarity_mean: float,
+        top_cluster_similarity: float,
+        stable_cluster_count: int,
+        final_summaries: list[_ClusterSummary],
+        alternating_blocks: int,
+    ) -> float:
+        evidence = 0.0
+        stable_shares = [summary.share for summary in final_summaries if summary.share >= self.config.multi_speaker_min_share]
+        if len(stable_shares) >= 2:
+            evidence += 0.34
+        if len(stable_shares) >= 3:
+            evidence += 0.18
+        if len(stable_shares) >= 2 and top_cluster_similarity < self.config.merge_similarity_threshold - 0.03:
+            evidence += 0.28
+        elif len(stable_shares) >= 2 and top_cluster_similarity < self.config.merge_similarity_threshold:
+            evidence += 0.18
+        if alternating_blocks >= 24:
+            evidence += 0.12
+        elif alternating_blocks >= 12:
+            evidence += 0.06
+        if adjacent_similarity_mean < self.config.single_speaker_similarity_floor - 0.025:
+            evidence += 0.12
+        if stable_cluster_count == 1:
+            evidence -= 0.18
+        return max(0.0, min(1.0, evidence))
+
+    def _should_collapse_to_single(
+        self,
+        *,
+        single_speaker_likelihood: float,
+        multi_speaker_evidence: float,
+        top_cluster_similarity: float,
+        stable_cluster_count: int,
+        final_summaries: list[_ClusterSummary],
+    ) -> bool:
+        if len(final_summaries) <= 1:
+            return True
+        if stable_cluster_count <= 1 and single_speaker_likelihood >= 0.45:
+            return True
+        if (
+            single_speaker_likelihood >= self.config.single_speaker_likelihood_threshold
+            and multi_speaker_evidence < 0.55
+        ):
+            return True
+        if (
+            stable_cluster_count == 2
+            and top_cluster_similarity >= self.config.merge_similarity_threshold
+            and multi_speaker_evidence < 0.6
+        ):
+            return True
+        if (
+            single_speaker_likelihood >= 0.4
+            and top_cluster_similarity >= self.config.merge_similarity_threshold + 0.02
+            and multi_speaker_evidence < 0.75
+        ):
+            return True
+        return False
 
     def _normalize_labels(self, labels: list[int], feature_indices: list[int]) -> dict[int, str]:
         ordered_labels: list[int] = []

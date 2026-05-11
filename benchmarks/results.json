@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-11T15:01:52.194606+00:00",
-  "run_id": "20260511_133331",
+  "generated_at": "2026-05-11T16:54:34.220135+00:00",
+  "run_id": "20260511_152536",
   "ai_mode": "local_only",
   "subtitle_checker_mode": "local_only",
   "available_media": [
@@ -63,25 +63,54 @@
             1
           ]
         ],
-        "report_path": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 701,
         "speaker_count": 4,
         "speaker_distribution": {
-          "Speaker 0": 198,
-          "Speaker 1": 170,
-          "Speaker 2": 178,
-          "Speaker 3": 155
+          "Speaker 0": 249,
+          "Speaker 1": 195,
+          "Speaker 2": 112,
+          "Speaker 3": 145
         },
-        "speaker_switches": 467,
-        "dominant_speaker_ratio": 0.2825,
+        "speaker_switches": 444,
+        "dominant_speaker_ratio": 0.3552,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 216.498,
-        "flags": []
+        "pipeline_seconds": 216.542,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 4,
+        "single_speaker_likelihood": 0.0,
+        "multi_speaker_evidence": 0.94,
+        "clusters_merged": 0,
+        "tiny_clusters_removed": 0,
+        "decision_reason": "kept_multi_speaker_clusters",
+        "adjacent_similarity_mean": 0.8598,
+        "top_cluster_similarity": 0.9279,
+        "stable_cluster_count": 4,
+        "alternating_blocks": 383,
+        "raw_cluster_distribution": {
+          "Cluster 1": 195,
+          "Cluster 2": 174,
+          "Cluster 0": 145,
+          "Cluster 3": 112
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 1": 0.2799,
+          "Cluster 2": 0.2765,
+          "Cluster 0": 0.2596,
+          "Cluster 3": 0.184
+        },
+        "cluster_label_distribution": {
+          "0": 145,
+          "1": 195,
+          "2": 174,
+          "3": 112
+        }
       },
       "scenarios": [
         {
@@ -114,9 +143,9 @@
               "long_segment_ratio": 0.0128,
               "avg_words_per_second": 3.7148,
               "avg_words_per_segment": 3.766,
-              "speaker_switch_rate_per_minute": 21.2167,
-              "speaker_switch_ratio": 0.6671,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 20.1717,
+              "speaker_switch_ratio": 0.6343,
+              "dominant_speaker_ratio": 0.3552,
               "chaos_ratio": 0.2625,
               "high_importance_ratio": 0.0514,
               "emotion_segment_ratio": 0.8773,
@@ -131,10 +160,10 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0128,
               "speaker_distribution": {
-                "Speaker 0": 198,
-                "Speaker 1": 170,
-                "Speaker 2": 178,
-                "Speaker 3": 155
+                "Speaker 0": 249,
+                "Speaker 1": 195,
+                "Speaker 2": 112,
+                "Speaker 3": 145
               },
               "heatmap_mean": 0.5011,
               "heatmap_peak": 1.0,
@@ -316,13 +345,13 @@
             "fallback_samples": 2349,
             "reaction_samples": 2,
             "zoom_samples": 5,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
+              "Speaker 0": 5,
               "Speaker 1": 5,
               "Speaker 2": 5,
               "Speaker 3": 5
@@ -364,6 +393,7 @@
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
+                  "Speaker 0",
                   "Speaker 1",
                   "Speaker 2",
                   "Speaker 3"
@@ -382,11 +412,11 @@
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\auto\\cuts_subtitles"
           }
         },
         {
@@ -413,9 +443,9 @@
               "long_segment_ratio": 0.0128,
               "avg_words_per_second": 3.7148,
               "avg_words_per_segment": 3.766,
-              "speaker_switch_rate_per_minute": 21.2167,
-              "speaker_switch_ratio": 0.6671,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 20.1717,
+              "speaker_switch_ratio": 0.6343,
+              "dominant_speaker_ratio": 0.3552,
               "chaos_ratio": 0.2625,
               "high_importance_ratio": 0.0514,
               "emotion_segment_ratio": 0.8773,
@@ -430,10 +460,10 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0128,
               "speaker_distribution": {
-                "Speaker 0": 198,
-                "Speaker 1": 170,
-                "Speaker 2": 178,
-                "Speaker 3": 155
+                "Speaker 0": 249,
+                "Speaker 1": 195,
+                "Speaker 2": 112,
+                "Speaker 3": 145
               },
               "heatmap_mean": 0.5011,
               "heatmap_peak": 1.0,
@@ -615,13 +645,13 @@
             "fallback_samples": 2349,
             "reaction_samples": 2,
             "zoom_samples": 5,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
+              "Speaker 0": 5,
               "Speaker 1": 5,
               "Speaker 2": 5,
               "Speaker 3": 5
@@ -663,6 +693,7 @@
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
+                  "Speaker 0",
                   "Speaker 1",
                   "Speaker 2",
                   "Speaker 3"
@@ -681,11 +712,11 @@
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\manual_gameplay\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\manual_gameplay\\cuts_subtitles"
           }
         },
         {
@@ -712,9 +743,9 @@
               "long_segment_ratio": 0.0128,
               "avg_words_per_second": 3.7148,
               "avg_words_per_segment": 3.766,
-              "speaker_switch_rate_per_minute": 21.2167,
-              "speaker_switch_ratio": 0.6671,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 20.1717,
+              "speaker_switch_ratio": 0.6343,
+              "dominant_speaker_ratio": 0.3552,
               "chaos_ratio": 0.2625,
               "high_importance_ratio": 0.0514,
               "emotion_segment_ratio": 0.8773,
@@ -729,10 +760,10 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0128,
               "speaker_distribution": {
-                "Speaker 0": 198,
-                "Speaker 1": 170,
-                "Speaker 2": 178,
-                "Speaker 3": 155
+                "Speaker 0": 249,
+                "Speaker 1": 195,
+                "Speaker 2": 112,
+                "Speaker 3": 145
               },
               "heatmap_mean": 0.5011,
               "heatmap_peak": 1.0,
@@ -913,8 +944,8 @@
             "fallback_samples": 2262,
             "reaction_samples": 1,
             "zoom_samples": 7,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
@@ -980,11 +1011,11 @@
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_podcast\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_podcast\\cuts_subtitles"
           }
         },
         {
@@ -1011,9 +1042,9 @@
               "long_segment_ratio": 0.0128,
               "avg_words_per_second": 3.7148,
               "avg_words_per_segment": 3.766,
-              "speaker_switch_rate_per_minute": 21.2167,
-              "speaker_switch_ratio": 0.6671,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 20.1717,
+              "speaker_switch_ratio": 0.6343,
+              "dominant_speaker_ratio": 0.3552,
               "chaos_ratio": 0.2625,
               "high_importance_ratio": 0.0514,
               "emotion_segment_ratio": 0.8773,
@@ -1028,10 +1059,10 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0128,
               "speaker_distribution": {
-                "Speaker 0": 198,
-                "Speaker 1": 170,
-                "Speaker 2": 178,
-                "Speaker 3": 155
+                "Speaker 0": 249,
+                "Speaker 1": 195,
+                "Speaker 2": 112,
+                "Speaker 3": 145
               },
               "heatmap_mean": 0.5011,
               "heatmap_peak": 1.0,
@@ -1212,8 +1243,8 @@
             "fallback_samples": 2075,
             "reaction_samples": 2,
             "zoom_samples": 4,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
@@ -1221,7 +1252,7 @@
               "Speaker 0": 5,
               "Speaker 1": 5,
               "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 3": 4
             },
             "multi_speaker_clips": 5,
             "empty_event_clips": 0,
@@ -1252,8 +1283,7 @@
                 "speakers": [
                   "Speaker 0",
                   "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 2"
                 ]
               },
               {
@@ -1279,11 +1309,11 @@
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -1332,9 +1362,9 @@
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\emeritos_gameplay\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\emeritos_gameplay\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (gameplay) with confidence 0.97.",
@@ -1384,27 +1414,48 @@
             1
           ]
         ],
-        "report_path": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 1053,
-        "speaker_count": 4,
+        "speaker_count": 1,
         "speaker_distribution": {
-          "Speaker 0": 246,
-          "Speaker 1": 312,
-          "Speaker 2": 125,
-          "Speaker 3": 370
+          "Speaker 0": 1053
         },
-        "speaker_switches": 684,
-        "dominant_speaker_ratio": 0.3514,
+        "speaker_switches": 0,
+        "dominant_speaker_ratio": 1.0,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 355.855,
-        "flags": [
-          "expected_single_speaker_but_detected_many"
-        ]
+        "pipeline_seconds": 356.092,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 1,
+        "single_speaker_likelihood": 0.7,
+        "multi_speaker_evidence": 0.46,
+        "clusters_merged": 1,
+        "tiny_clusters_removed": 1,
+        "decision_reason": "collapsed_to_single_speaker_due_to_weak_multi_evidence",
+        "adjacent_similarity_mean": 0.9785,
+        "top_cluster_similarity": 0.9812,
+        "stable_cluster_count": 2,
+        "alternating_blocks": 516,
+        "raw_cluster_distribution": {
+          "Cluster 0": 507,
+          "Cluster 2": 361,
+          "Cluster 1": 158,
+          "Cluster 3": 8
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 0": 0.4842,
+          "Cluster 2": 0.3711,
+          "Cluster 1": 0.1383,
+          "Cluster 3": 0.0063
+        },
+        "cluster_label_distribution": {
+          "0": 1034
+        }
       },
       "scenarios": [
         {
@@ -1429,7 +1480,7 @@
             },
             "features": {
               "segment_count": 1053,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.8538,
               "avg_segment_duration": 1.6975,
               "median_segment_duration": 1.64,
@@ -1437,9 +1488,9 @@
               "long_segment_ratio": 0.0275,
               "avg_words_per_second": 2.7682,
               "avg_words_per_segment": 4.699,
-              "speaker_switch_rate_per_minute": 19.6047,
-              "speaker_switch_ratio": 0.6502,
-              "dominant_speaker_ratio": 0.3514,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0674,
               "high_importance_ratio": 0.0285,
               "emotion_segment_ratio": 0.6714,
@@ -1454,10 +1505,7 @@
               "commentary_segment_ratio": 0.0237,
               "qa_turn_ratio": 0.0038,
               "speaker_distribution": {
-                "Speaker 0": 246,
-                "Speaker 1": 312,
-                "Speaker 2": 125,
-                "Speaker 3": 370
+                "Speaker 0": 1053
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -1508,10 +1556,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 76.19,
-              "max": 81.0,
-              "mean": 77.964,
-              "median": 76.92,
+              "min": 74.19,
+              "max": 79.0,
+              "mean": 75.964,
+              "median": 74.92,
               "stdev": 1.8128
             },
             "duration_distribution": {
@@ -1545,7 +1593,7 @@
                 "start_label": "17:40.72",
                 "end_label": "18:16.46",
                 "duration": 35.74,
-                "local_score": 81.0,
+                "local_score": 79.0,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1562,7 +1610,7 @@
                 "start_label": "11:56.88",
                 "end_label": "12:27.68",
                 "duration": 30.8,
-                "local_score": 79.07,
+                "local_score": 77.07,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1579,7 +1627,7 @@
                 "start_label": "10:12.83",
                 "end_label": "10:48.78",
                 "duration": 35.95,
-                "local_score": 76.92,
+                "local_score": 74.92,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1596,7 +1644,7 @@
                 "start_label": "22:37.76",
                 "end_label": "23:08.12",
                 "duration": 30.36,
-                "local_score": 76.64,
+                "local_score": 74.64,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1613,7 +1661,7 @@
                 "start_label": "13:06.56",
                 "end_label": "13:43.52",
                 "duration": 36.96,
-                "local_score": 76.19,
+                "local_score": 74.19,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1639,78 +1687,60 @@
             "fallback_samples": 223,
             "reaction_samples": 4,
             "zoom_samples": 68,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 22,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\auto\\cuts_subtitles"
           }
         },
         {
@@ -1729,7 +1759,7 @@
             },
             "features": {
               "segment_count": 1053,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.8538,
               "avg_segment_duration": 1.6975,
               "median_segment_duration": 1.64,
@@ -1737,9 +1767,9 @@
               "long_segment_ratio": 0.0275,
               "avg_words_per_second": 2.7682,
               "avg_words_per_segment": 4.699,
-              "speaker_switch_rate_per_minute": 19.6047,
-              "speaker_switch_ratio": 0.6502,
-              "dominant_speaker_ratio": 0.3514,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0674,
               "high_importance_ratio": 0.0285,
               "emotion_segment_ratio": 0.6714,
@@ -1754,10 +1784,7 @@
               "commentary_segment_ratio": 0.0237,
               "qa_turn_ratio": 0.0038,
               "speaker_distribution": {
-                "Speaker 0": 246,
-                "Speaker 1": 312,
-                "Speaker 2": 125,
-                "Speaker 3": 370
+                "Speaker 0": 1053
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -1808,10 +1835,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 76.19,
-              "max": 81.0,
-              "mean": 77.964,
-              "median": 76.92,
+              "min": 74.19,
+              "max": 79.0,
+              "mean": 75.964,
+              "median": 74.92,
               "stdev": 1.8128
             },
             "duration_distribution": {
@@ -1845,7 +1872,7 @@
                 "start_label": "17:40.72",
                 "end_label": "18:16.46",
                 "duration": 35.74,
-                "local_score": 81.0,
+                "local_score": 79.0,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1862,7 +1889,7 @@
                 "start_label": "11:56.88",
                 "end_label": "12:27.68",
                 "duration": 30.8,
-                "local_score": 79.07,
+                "local_score": 77.07,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1879,7 +1906,7 @@
                 "start_label": "10:12.83",
                 "end_label": "10:48.78",
                 "duration": 35.95,
-                "local_score": 76.92,
+                "local_score": 74.92,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1896,7 +1923,7 @@
                 "start_label": "22:37.76",
                 "end_label": "23:08.12",
                 "duration": 30.36,
-                "local_score": 76.64,
+                "local_score": 74.64,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1913,7 +1940,7 @@
                 "start_label": "13:06.56",
                 "end_label": "13:43.52",
                 "duration": 36.96,
-                "local_score": 76.19,
+                "local_score": 74.19,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -1939,78 +1966,60 @@
             "fallback_samples": 223,
             "reaction_samples": 4,
             "zoom_samples": 68,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 22,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\manual_commentary\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\manual_commentary\\cuts_subtitles"
           }
         },
         {
@@ -2029,7 +2038,7 @@
             },
             "features": {
               "segment_count": 1053,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.8538,
               "avg_segment_duration": 1.6975,
               "median_segment_duration": 1.64,
@@ -2037,9 +2046,9 @@
               "long_segment_ratio": 0.0275,
               "avg_words_per_second": 2.7682,
               "avg_words_per_segment": 4.699,
-              "speaker_switch_rate_per_minute": 19.6047,
-              "speaker_switch_ratio": 0.6502,
-              "dominant_speaker_ratio": 0.3514,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0674,
               "high_importance_ratio": 0.0285,
               "emotion_segment_ratio": 0.6714,
@@ -2054,10 +2063,7 @@
               "commentary_segment_ratio": 0.0237,
               "qa_turn_ratio": 0.0038,
               "speaker_distribution": {
-                "Speaker 0": 246,
-                "Speaker 1": 312,
-                "Speaker 2": 125,
-                "Speaker 3": 370
+                "Speaker 0": 1053
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -2108,10 +2114,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 80.18,
-              "max": 84.96,
-              "mean": 81.836,
-              "median": 80.8,
+              "min": 66.18,
+              "max": 70.96,
+              "mean": 67.836,
+              "median": 66.8,
               "stdev": 1.7613
             },
             "duration_distribution": {
@@ -2133,7 +2139,7 @@
             },
             "selection_reason_counts": {
               "good speech density for a short clip": 5,
-              "has speaker dynamics or conversational turns": 5,
+              "stays relatively clear despite overlap risk": 5,
               "starts with a stronger hook signal": 4,
               "ends with a clearer payoff signal": 1
             },
@@ -2145,13 +2151,13 @@
                 "start_label": "17:40.72",
                 "end_label": "18:16.46",
                 "duration": 35.74,
-                "local_score": 84.96,
+                "local_score": 70.96,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "good speech density for a short clip",
-                  "has speaker dynamics or conversational turns",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "Co z tego zrealizowano? Nic, nul, na fink, tak. Mamy obecność Finlandii i Szwecji. W NATO, NATO jest jeszcze mocniejsze na granicach Ukrainy. Mamy gwałtowne zbrojenia państw bałtywskich, Polski...."
               },
@@ -2162,13 +2168,13 @@
                 "start_label": "11:56.88",
                 "end_label": "12:27.68",
                 "duration": 30.8,
-                "local_score": 82.58,
+                "local_score": 68.58,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "I teraz, co nam ucieka i gdzie jest duża czarna liczba, która zaniża faktycznie z tą liczbę poległych Rosjan? No więc tak, nie mamy tutaj ujętych najemników, którzy nie mają rosyjskiego bywatelska...."
               },
@@ -2179,13 +2185,13 @@
                 "start_label": "22:37.76",
                 "end_label": "23:08.12",
                 "duration": 30.36,
-                "local_score": 80.8,
+                "local_score": 66.8,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "wiem, że to brzmi przerażająco, ale jak jakiś opornik ukraiński wpada rosyjska tonówka czy półtonówka no to niestety identyfikacja szczątek żołnierzy jest możliwa już tylko podena, tak? Więc jest 56 tysięcy zaginionych i..."
               },
@@ -2196,13 +2202,13 @@
                 "start_label": "10:12.83",
                 "end_label": "10:48.78",
                 "duration": 35.95,
-                "local_score": 80.66,
+                "local_score": 66.66,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "ends with a clearer payoff signal"
+                  "ends with a clearer payoff signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "Koniec końcika czytelniczego przechodzimy do tego, co wszyscy robimy najbardziej, czyli ponad miliona gruzu 200 i gruzu 300...."
               },
@@ -2213,13 +2219,13 @@
                 "start_label": "13:06.56",
                 "end_label": "13:44.74",
                 "duration": 38.18,
-                "local_score": 80.18,
+                "local_score": 66.18,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "przez całą papierologię, po co? po to, żeby oczywiście schować sobie do kieszeni rząd poległego żołnierza...."
               }
@@ -2239,78 +2245,60 @@
             "fallback_samples": 223,
             "reaction_samples": 4,
             "zoom_samples": 82,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 23,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_podcast\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_podcast\\cuts_subtitles"
           }
         },
         {
@@ -2329,7 +2317,7 @@
             },
             "features": {
               "segment_count": 1053,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.8538,
               "avg_segment_duration": 1.6975,
               "median_segment_duration": 1.64,
@@ -2337,9 +2325,9 @@
               "long_segment_ratio": 0.0275,
               "avg_words_per_second": 2.7682,
               "avg_words_per_segment": 4.699,
-              "speaker_switch_rate_per_minute": 19.6047,
-              "speaker_switch_ratio": 0.6502,
-              "dominant_speaker_ratio": 0.3514,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0674,
               "high_importance_ratio": 0.0285,
               "emotion_segment_ratio": 0.6714,
@@ -2354,10 +2342,7 @@
               "commentary_segment_ratio": 0.0237,
               "qa_turn_ratio": 0.0038,
               "speaker_distribution": {
-                "Speaker 0": 246,
-                "Speaker 1": 312,
-                "Speaker 2": 125,
-                "Speaker 3": 370
+                "Speaker 0": 1053
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -2407,10 +2392,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 76.91,
-              "max": 82.33,
-              "mean": 78.912,
-              "median": 78.0,
+              "min": 71.91,
+              "max": 77.33,
+              "mean": 73.912,
+              "median": 73.0,
               "stdev": 1.9763
             },
             "duration_distribution": {
@@ -2445,7 +2430,7 @@
                 "start_label": "17:40.72",
                 "end_label": "18:16.46",
                 "duration": 35.74,
-                "local_score": 82.33,
+                "local_score": 77.33,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2462,7 +2447,7 @@
                 "start_label": "11:56.88",
                 "end_label": "12:27.68",
                 "duration": 30.8,
-                "local_score": 79.86,
+                "local_score": 74.86,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2479,7 +2464,7 @@
                 "start_label": "20:43.05",
                 "end_label": "21:13.50",
                 "duration": 30.45,
-                "local_score": 78.0,
+                "local_score": 73.0,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2496,7 +2481,7 @@
                 "start_label": "10:12.83",
                 "end_label": "10:48.78",
                 "duration": 35.95,
-                "local_score": 77.46,
+                "local_score": 72.46,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2513,7 +2498,7 @@
                 "start_label": "22:39.10",
                 "end_label": "23:23.72",
                 "duration": 44.62,
-                "local_score": 76.91,
+                "local_score": 71.91,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2539,78 +2524,60 @@
             "fallback_samples": 283,
             "reaction_samples": 4,
             "zoom_samples": 69,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 14,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 22,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -2659,14 +2626,13 @@
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\ukraine_war_report",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\ukraine_war_report\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\ukraine_war_report",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\ukraine_war_report\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (commentary) with confidence 0.97.",
         "Subtitle checker reported warnings (10), but no hard failure.",
-        "Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many",
         "All rendered benchmark scenarios produced the requested subtitled clips."
       ]
     },
@@ -2698,27 +2664,48 @@
         },
         "ai_status": "skipped",
         "top_issue_codes": [],
-        "report_path": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 439,
-        "speaker_count": 4,
+        "speaker_count": 1,
         "speaker_distribution": {
-          "Speaker 0": 113,
-          "Speaker 1": 111,
-          "Speaker 2": 124,
-          "Speaker 3": 91
+          "Speaker 0": 439
         },
-        "speaker_switches": 288,
-        "dominant_speaker_ratio": 0.2825,
+        "speaker_switches": 0,
+        "dominant_speaker_ratio": 1.0,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 250.608,
-        "flags": [
-          "expected_single_speaker_but_detected_many"
-        ]
+        "pipeline_seconds": 250.82,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 1,
+        "single_speaker_likelihood": 0.42,
+        "multi_speaker_evidence": 0.64,
+        "clusters_merged": 0,
+        "tiny_clusters_removed": 0,
+        "decision_reason": "collapsed_to_single_speaker_due_to_weak_multi_evidence",
+        "adjacent_similarity_mean": 0.9682,
+        "top_cluster_similarity": 0.9854,
+        "stable_cluster_count": 3,
+        "alternating_blocks": 257,
+        "raw_cluster_distribution": {
+          "Cluster 3": 117,
+          "Cluster 2": 123,
+          "Cluster 1": 122,
+          "Cluster 0": 77
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 3": 0.2852,
+          "Cluster 2": 0.2746,
+          "Cluster 1": 0.2655,
+          "Cluster 0": 0.1748
+        },
+        "cluster_label_distribution": {
+          "0": 439
+        }
       },
       "scenarios": [
         {
@@ -2743,7 +2730,7 @@
             },
             "features": {
               "segment_count": 439,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.9213,
               "avg_segment_duration": 2.8151,
               "median_segment_duration": 2.7,
@@ -2751,9 +2738,9 @@
               "long_segment_ratio": 0.2255,
               "avg_words_per_second": 2.7811,
               "avg_words_per_segment": 7.8292,
-              "speaker_switch_rate_per_minute": 12.8822,
-              "speaker_switch_ratio": 0.6575,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0023,
               "high_importance_ratio": 0.0091,
               "emotion_segment_ratio": 0.2825,
@@ -2768,10 +2755,7 @@
               "commentary_segment_ratio": 0.0387,
               "qa_turn_ratio": 0.0068,
               "speaker_distribution": {
-                "Speaker 0": 113,
-                "Speaker 1": 111,
-                "Speaker 2": 124,
-                "Speaker 3": 91
+                "Speaker 0": 439
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -2822,10 +2806,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 69.83,
-              "max": 78.4,
-              "mean": 73.556,
-              "median": 72.27,
+              "min": 67.83,
+              "max": 76.4,
+              "mean": 71.556,
+              "median": 70.27,
               "stdev": 3.4719
             },
             "duration_distribution": {
@@ -2859,7 +2843,7 @@
                 "start_label": "19:54.36",
                 "end_label": "20:31.18",
                 "duration": 36.82,
-                "local_score": 78.4,
+                "local_score": 76.4,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2876,7 +2860,7 @@
                 "start_label": "19:09.66",
                 "end_label": "19:41.82",
                 "duration": 32.16,
-                "local_score": 76.9,
+                "local_score": 74.9,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2893,7 +2877,7 @@
                 "start_label": "00:53.90",
                 "end_label": "01:26.86",
                 "duration": 32.96,
-                "local_score": 72.27,
+                "local_score": 70.27,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2910,7 +2894,7 @@
                 "start_label": "11:14.48",
                 "end_label": "11:53.92",
                 "duration": 39.44,
-                "local_score": 70.38,
+                "local_score": 68.38,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2927,7 +2911,7 @@
                 "start_label": "04:13.30",
                 "end_label": "04:54.70",
                 "duration": 41.4,
-                "local_score": 69.83,
+                "local_score": 67.83,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -2953,75 +2937,60 @@
             "fallback_samples": 1240,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 3
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 7,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 11,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\auto\\cuts_subtitles"
           }
         },
         {
@@ -3040,7 +3009,7 @@
             },
             "features": {
               "segment_count": 439,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.9213,
               "avg_segment_duration": 2.8151,
               "median_segment_duration": 2.7,
@@ -3048,9 +3017,9 @@
               "long_segment_ratio": 0.2255,
               "avg_words_per_second": 2.7811,
               "avg_words_per_segment": 7.8292,
-              "speaker_switch_rate_per_minute": 12.8822,
-              "speaker_switch_ratio": 0.6575,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0023,
               "high_importance_ratio": 0.0091,
               "emotion_segment_ratio": 0.2825,
@@ -3065,10 +3034,7 @@
               "commentary_segment_ratio": 0.0387,
               "qa_turn_ratio": 0.0068,
               "speaker_distribution": {
-                "Speaker 0": 113,
-                "Speaker 1": 111,
-                "Speaker 2": 124,
-                "Speaker 3": 91
+                "Speaker 0": 439
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -3119,10 +3085,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 69.83,
-              "max": 78.4,
-              "mean": 73.556,
-              "median": 72.27,
+              "min": 67.83,
+              "max": 76.4,
+              "mean": 71.556,
+              "median": 70.27,
               "stdev": 3.4719
             },
             "duration_distribution": {
@@ -3156,7 +3122,7 @@
                 "start_label": "19:54.36",
                 "end_label": "20:31.18",
                 "duration": 36.82,
-                "local_score": 78.4,
+                "local_score": 76.4,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3173,7 +3139,7 @@
                 "start_label": "19:09.66",
                 "end_label": "19:41.82",
                 "duration": 32.16,
-                "local_score": 76.9,
+                "local_score": 74.9,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3190,7 +3156,7 @@
                 "start_label": "00:53.90",
                 "end_label": "01:26.86",
                 "duration": 32.96,
-                "local_score": 72.27,
+                "local_score": 70.27,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3207,7 +3173,7 @@
                 "start_label": "11:14.48",
                 "end_label": "11:53.92",
                 "duration": 39.44,
-                "local_score": 70.38,
+                "local_score": 68.38,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3224,7 +3190,7 @@
                 "start_label": "04:13.30",
                 "end_label": "04:54.70",
                 "duration": 41.4,
-                "local_score": 69.83,
+                "local_score": 67.83,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3250,75 +3216,60 @@
             "fallback_samples": 1240,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 3
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 7,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 11,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\manual_commentary\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\manual_commentary\\cuts_subtitles"
           }
         },
         {
@@ -3337,7 +3288,7 @@
             },
             "features": {
               "segment_count": 439,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.9213,
               "avg_segment_duration": 2.8151,
               "median_segment_duration": 2.7,
@@ -3345,9 +3296,9 @@
               "long_segment_ratio": 0.2255,
               "avg_words_per_second": 2.7811,
               "avg_words_per_segment": 7.8292,
-              "speaker_switch_rate_per_minute": 12.8822,
-              "speaker_switch_ratio": 0.6575,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0023,
               "high_importance_ratio": 0.0091,
               "emotion_segment_ratio": 0.2825,
@@ -3362,10 +3313,7 @@
               "commentary_segment_ratio": 0.0387,
               "qa_turn_ratio": 0.0068,
               "speaker_distribution": {
-                "Speaker 0": 113,
-                "Speaker 1": 111,
-                "Speaker 2": 124,
-                "Speaker 3": 91
+                "Speaker 0": 439
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -3416,10 +3364,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 72.62,
-              "max": 82.71,
-              "mean": 76.182,
-              "median": 74.25,
+              "min": 58.62,
+              "max": 68.71,
+              "mean": 62.182,
+              "median": 60.25,
               "stdev": 3.569
             },
             "duration_distribution": {
@@ -3440,9 +3388,9 @@
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
-              "has speaker dynamics or conversational turns": 5,
               "good speech density for a short clip": 5,
-              "stays relatively clear despite overlap risk": 3,
+              "ends with a clearer payoff signal": 4,
+              "stays relatively clear despite overlap risk": 4,
               "starts with a stronger hook signal": 2
             },
             "clips": [
@@ -3453,13 +3401,13 @@
                 "start_label": "19:09.66",
                 "end_label": "20:01.48",
                 "duration": 51.82,
-                "local_score": 82.71,
+                "local_score": 68.71,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "Jak oceniać Romana Giertycha? Jeśli patrzeć wyłącznie na kwestie światopoglądowe, na aborcję, homoseksualizm, role kościoła, to Giertych nie zmienił się tak bardzo, jak się wydaje...."
               },
@@ -3470,13 +3418,13 @@
                 "start_label": "00:53.90",
                 "end_label": "01:26.86",
                 "duration": 32.96,
-                "local_score": 77.1,
+                "local_score": 63.1,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "starts with a stronger hook signal",
-                  "good speech density for a short clip"
+                  "good speech density for a short clip",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "Czy naprawdę zmienił poglądy, czy tylko zmienił otoczenie? I co o całej historii Romana Giertycha mówi niedawny materiał śledczy Szymona Jadrzaka o tajemniczych przelewach z Liechtensteinu i rosyjskich powiązaniach jego..."
               },
@@ -3487,13 +3435,13 @@
                 "start_label": "11:14.48",
                 "end_label": "11:53.92",
                 "duration": 39.44,
-                "local_score": 74.25,
+                "local_score": 60.25,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "jest zasadniczo zgodny z duchem cywilizacji łacińskiej europejskiej. Co ciekawe, wśród przyczyn wskazał rozmowy z politykami Lewicy, Józefem Oleksym i Leszkiem Milerem...."
               },
@@ -3504,13 +3452,13 @@
                 "start_label": "04:13.30",
                 "end_label": "04:54.70",
                 "duration": 41.4,
-                "local_score": 74.23,
+                "local_score": 60.23,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "good speech density for a short clip",
-                  "has speaker dynamics or conversational turns",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "jak mówili ci, którzy byli z wolennikami wejścia do Unii...."
               },
@@ -3521,13 +3469,13 @@
                 "start_label": "13:39.04",
                 "end_label": "14:30.56",
                 "duration": 51.52,
-                "local_score": 72.62,
+                "local_score": 58.62,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "Co chyba najlepiej oddaje scenazy 2 kwietnia 2025 roku...."
               }
@@ -3547,76 +3495,60 @@
             "fallback_samples": 1655,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 4
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 7,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 11,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 15,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_podcast\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_podcast\\cuts_subtitles"
           }
         },
         {
@@ -3635,7 +3567,7 @@
             },
             "features": {
               "segment_count": 439,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.9213,
               "avg_segment_duration": 2.8151,
               "median_segment_duration": 2.7,
@@ -3643,9 +3575,9 @@
               "long_segment_ratio": 0.2255,
               "avg_words_per_second": 2.7811,
               "avg_words_per_segment": 7.8292,
-              "speaker_switch_rate_per_minute": 12.8822,
-              "speaker_switch_ratio": 0.6575,
-              "dominant_speaker_ratio": 0.2825,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0023,
               "high_importance_ratio": 0.0091,
               "emotion_segment_ratio": 0.2825,
@@ -3660,10 +3592,7 @@
               "commentary_segment_ratio": 0.0387,
               "qa_turn_ratio": 0.0068,
               "speaker_distribution": {
-                "Speaker 0": 113,
-                "Speaker 1": 111,
-                "Speaker 2": 124,
-                "Speaker 3": 91
+                "Speaker 0": 439
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -3713,10 +3642,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 71.5,
-              "max": 78.74,
-              "mean": 74.666,
-              "median": 72.99,
+              "min": 66.5,
+              "max": 73.74,
+              "mean": 69.666,
+              "median": 67.99,
               "stdev": 3.0856
             },
             "duration_distribution": {
@@ -3750,7 +3679,7 @@
                 "start_label": "19:54.36",
                 "end_label": "20:31.18",
                 "duration": 36.82,
-                "local_score": 78.74,
+                "local_score": 73.74,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3767,7 +3696,7 @@
                 "start_label": "19:09.66",
                 "end_label": "19:41.82",
                 "duration": 32.16,
-                "local_score": 78.04,
+                "local_score": 73.04,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3784,7 +3713,7 @@
                 "start_label": "00:53.90",
                 "end_label": "01:26.86",
                 "duration": 32.96,
-                "local_score": 72.99,
+                "local_score": 67.99,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3801,7 +3730,7 @@
                 "start_label": "11:14.48",
                 "end_label": "11:53.92",
                 "duration": 39.44,
-                "local_score": 72.06,
+                "local_score": 67.06,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3818,7 +3747,7 @@
                 "start_label": "12:20.16",
                 "end_label": "12:56.24",
                 "duration": 36.08,
-                "local_score": 71.5,
+                "local_score": 66.5,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -3844,74 +3773,60 @@
             "fallback_samples": 1252,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 3,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 3
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 7,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 11,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 12,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -3960,14 +3875,13 @@
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\roman_giertych_commentary\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\roman_giertych_commentary\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (commentary) with confidence 0.97.",
         "Subtitle checker reported warnings (0), but no hard failure.",
-        "Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many",
         "All rendered benchmark scenarios produced the requested subtitled clips."
       ]
     },
@@ -3999,27 +3913,48 @@
         },
         "ai_status": "skipped",
         "top_issue_codes": [],
-        "report_path": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 229,
-        "speaker_count": 4,
+        "speaker_count": 1,
         "speaker_distribution": {
-          "Speaker 0": 63,
-          "Speaker 1": 56,
-          "Speaker 2": 71,
-          "Speaker 3": 39
+          "Speaker 0": 229
         },
-        "speaker_switches": 148,
-        "dominant_speaker_ratio": 0.31,
+        "speaker_switches": 0,
+        "dominant_speaker_ratio": 1.0,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 144.946,
-        "flags": [
-          "expected_single_speaker_but_detected_many"
-        ]
+        "pipeline_seconds": 145.054,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 1,
+        "single_speaker_likelihood": 0.7,
+        "multi_speaker_evidence": 0.46,
+        "clusters_merged": 1,
+        "tiny_clusters_removed": 0,
+        "decision_reason": "collapsed_to_single_speaker_due_to_weak_multi_evidence",
+        "adjacent_similarity_mean": 0.9635,
+        "top_cluster_similarity": 0.9734,
+        "stable_cluster_count": 2,
+        "alternating_blocks": 105,
+        "raw_cluster_distribution": {
+          "Cluster 3": 93,
+          "Cluster 1": 97,
+          "Cluster 0": 27,
+          "Cluster 2": 12
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 3": 0.4376,
+          "Cluster 1": 0.414,
+          "Cluster 0": 0.1125,
+          "Cluster 2": 0.0359
+        },
+        "cluster_label_distribution": {
+          "0": 229
+        }
       },
       "scenarios": [
         {
@@ -4044,7 +3979,7 @@
             },
             "features": {
               "segment_count": 229,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.913,
               "avg_segment_duration": 3.7931,
               "median_segment_duration": 3.56,
@@ -4052,9 +3987,9 @@
               "long_segment_ratio": 0.5197,
               "avg_words_per_second": 2.5374,
               "avg_words_per_segment": 9.6245,
-              "speaker_switch_rate_per_minute": 9.3337,
-              "speaker_switch_ratio": 0.6491,
-              "dominant_speaker_ratio": 0.31,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0,
               "high_importance_ratio": 0.0175,
               "emotion_segment_ratio": 0.3581,
@@ -4069,10 +4004,7 @@
               "commentary_segment_ratio": 0.1572,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 63,
-                "Speaker 1": 56,
-                "Speaker 2": 71,
-                "Speaker 3": 39
+                "Speaker 0": 229
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -4123,10 +4055,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 66.32,
-              "max": 73.7,
-              "mean": 70.428,
-              "median": 70.91,
+              "min": 64.32,
+              "max": 71.7,
+              "mean": 68.428,
+              "median": 68.91,
               "stdev": 2.4252
             },
             "duration_distribution": {
@@ -4160,7 +4092,7 @@
                 "start_label": "06:57.53",
                 "end_label": "07:47.13",
                 "duration": 49.6,
-                "local_score": 73.7,
+                "local_score": 71.7,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4177,7 +4109,7 @@
                 "start_label": "00:55.26",
                 "end_label": "01:34.25",
                 "duration": 38.99,
-                "local_score": 71.48,
+                "local_score": 69.48,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4194,7 +4126,7 @@
                 "start_label": "10:08.63",
                 "end_label": "10:39.61",
                 "duration": 30.98,
-                "local_score": 70.91,
+                "local_score": 68.91,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4211,7 +4143,7 @@
                 "start_label": "12:31.65",
                 "end_label": "13:06.09",
                 "duration": 34.44,
-                "local_score": 69.73,
+                "local_score": 67.73,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4228,7 +4160,7 @@
                 "start_label": "03:28.09",
                 "end_label": "04:02.47",
                 "duration": 34.38,
-                "local_score": 66.32,
+                "local_score": 64.32,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4254,76 +4186,60 @@
             "fallback_samples": 325,
             "reaction_samples": 0,
             "zoom_samples": 11,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 4
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 12,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\auto\\cuts_subtitles"
           }
         },
         {
@@ -4342,7 +4258,7 @@
             },
             "features": {
               "segment_count": 229,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.913,
               "avg_segment_duration": 3.7931,
               "median_segment_duration": 3.56,
@@ -4350,9 +4266,9 @@
               "long_segment_ratio": 0.5197,
               "avg_words_per_second": 2.5374,
               "avg_words_per_segment": 9.6245,
-              "speaker_switch_rate_per_minute": 9.3337,
-              "speaker_switch_ratio": 0.6491,
-              "dominant_speaker_ratio": 0.31,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0,
               "high_importance_ratio": 0.0175,
               "emotion_segment_ratio": 0.3581,
@@ -4367,10 +4283,7 @@
               "commentary_segment_ratio": 0.1572,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 63,
-                "Speaker 1": 56,
-                "Speaker 2": 71,
-                "Speaker 3": 39
+                "Speaker 0": 229
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -4421,10 +4334,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 66.32,
-              "max": 73.7,
-              "mean": 70.428,
-              "median": 70.91,
+              "min": 64.32,
+              "max": 71.7,
+              "mean": 68.428,
+              "median": 68.91,
               "stdev": 2.4252
             },
             "duration_distribution": {
@@ -4458,7 +4371,7 @@
                 "start_label": "06:57.53",
                 "end_label": "07:47.13",
                 "duration": 49.6,
-                "local_score": 73.7,
+                "local_score": 71.7,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4475,7 +4388,7 @@
                 "start_label": "00:55.26",
                 "end_label": "01:34.25",
                 "duration": 38.99,
-                "local_score": 71.48,
+                "local_score": 69.48,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4492,7 +4405,7 @@
                 "start_label": "10:08.63",
                 "end_label": "10:39.61",
                 "duration": 30.98,
-                "local_score": 70.91,
+                "local_score": 68.91,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4509,7 +4422,7 @@
                 "start_label": "12:31.65",
                 "end_label": "13:06.09",
                 "duration": 34.44,
-                "local_score": 69.73,
+                "local_score": 67.73,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4526,7 +4439,7 @@
                 "start_label": "03:28.09",
                 "end_label": "04:02.47",
                 "duration": 34.38,
-                "local_score": 66.32,
+                "local_score": 64.32,
                 "selection_strategy": "commentary",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -4552,76 +4465,60 @@
             "fallback_samples": 325,
             "reaction_samples": 0,
             "zoom_samples": 11,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 4
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 12,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\manual_commentary\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\manual_commentary\\cuts_subtitles"
           }
         },
         {
@@ -4640,7 +4537,7 @@
             },
             "features": {
               "segment_count": 229,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.913,
               "avg_segment_duration": 3.7931,
               "median_segment_duration": 3.56,
@@ -4648,9 +4545,9 @@
               "long_segment_ratio": 0.5197,
               "avg_words_per_second": 2.5374,
               "avg_words_per_segment": 9.6245,
-              "speaker_switch_rate_per_minute": 9.3337,
-              "speaker_switch_ratio": 0.6491,
-              "dominant_speaker_ratio": 0.31,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0,
               "high_importance_ratio": 0.0175,
               "emotion_segment_ratio": 0.3581,
@@ -4665,10 +4562,7 @@
               "commentary_segment_ratio": 0.1572,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 63,
-                "Speaker 1": 56,
-                "Speaker 2": 71,
-                "Speaker 3": 39
+                "Speaker 0": 229
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -4719,10 +4613,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 70.39,
-              "max": 78.98,
-              "mean": 74.36,
-              "median": 74.36,
+              "min": 56.39,
+              "max": 64.98,
+              "mean": 60.36,
+              "median": 60.36,
               "stdev": 2.756
             },
             "duration_distribution": {
@@ -4743,9 +4637,9 @@
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
-              "has speaker dynamics or conversational turns": 5,
               "good speech density for a short clip": 5,
-              "stays relatively clear despite overlap risk": 4,
+              "stays relatively clear despite overlap risk": 5,
+              "ends with a clearer payoff signal": 4,
               "starts with a stronger hook signal": 1
             },
             "clips": [
@@ -4756,13 +4650,13 @@
                 "start_label": "06:57.53",
                 "end_label": "07:47.13",
                 "duration": 49.6,
-                "local_score": 78.98,
+                "local_score": 64.98,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "starts with a stronger hook signal"
+                  "starts with a stronger hook signal",
+                  "stays relatively clear despite overlap risk"
                 ],
                 "summary": "Chcesz zacząć inwestować, ale nie wiesz jak? Sprawdź aplikację inwestycyjną XTB. Teraz otwierając konto...."
               },
@@ -4773,13 +4667,13 @@
                 "start_label": "10:08.63",
                 "end_label": "10:39.61",
                 "duration": 30.98,
-                "local_score": 74.61,
+                "local_score": 60.61,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "że to Władimir Putin prosił o Rosję. Nie tak jak w poprzednich latach, to Ukrainy zależało na Rosyjmie. Teraz to Rosji zależało na Rosyjmie. A Wołodymyr Załęski jakby się z Władimirem Putinem droczył...."
               },
@@ -4790,13 +4684,13 @@
                 "start_label": "00:55.26",
                 "end_label": "01:34.25",
                 "duration": 38.99,
-                "local_score": 74.36,
+                "local_score": 60.36,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "o twój wybór. Zawsze płacę zenem, nieważne za co. Ważne, że w zenie zarabiam na każdych zakupach. Ty też możesz...."
               },
@@ -4807,13 +4701,13 @@
                 "start_label": "12:31.65",
                 "end_label": "13:06.09",
                 "duration": 34.44,
-                "local_score": 73.46,
+                "local_score": 59.46,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "A to wyłączanie internetu naprawdę Rosjan boli jak nic innego, to wywołało największą reakcję w rosyjskim społeczeństwie, a 9 maja i zapowiedziano to wcześniej, to też jest bardzo symptomatyczne...."
               },
@@ -4824,13 +4718,13 @@
                 "start_label": "14:34.63",
                 "end_label": "15:19.99",
                 "duration": 45.36,
-                "local_score": 70.39,
+                "local_score": 56.39,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
                   "good speech density for a short clip",
-                  "stays relatively clear despite overlap risk"
+                  "stays relatively clear despite overlap risk",
+                  "ends with a clearer payoff signal"
                 ],
                 "summary": "czyli zorganizowania, no nie wiem nawet jak to nazwać, parad dzieci...."
               }
@@ -4850,77 +4744,60 @@
             "fallback_samples": 382,
             "reaction_samples": 0,
             "zoom_samples": 11,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 4
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 12,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 10,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_podcast\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_podcast\\cuts_subtitles"
           }
         },
         {
@@ -4939,7 +4816,7 @@
             },
             "features": {
               "segment_count": 229,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.913,
               "avg_segment_duration": 3.7931,
               "median_segment_duration": 3.56,
@@ -4947,9 +4824,9 @@
               "long_segment_ratio": 0.5197,
               "avg_words_per_second": 2.5374,
               "avg_words_per_segment": 9.6245,
-              "speaker_switch_rate_per_minute": 9.3337,
-              "speaker_switch_ratio": 0.6491,
-              "dominant_speaker_ratio": 0.31,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0,
               "high_importance_ratio": 0.0175,
               "emotion_segment_ratio": 0.3581,
@@ -4964,10 +4841,7 @@
               "commentary_segment_ratio": 0.1572,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 63,
-                "Speaker 1": 56,
-                "Speaker 2": 71,
-                "Speaker 3": 39
+                "Speaker 0": 229
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -5017,10 +4891,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 68.88,
-              "max": 74.92,
-              "mean": 72.398,
-              "median": 73.31,
+              "min": 63.88,
+              "max": 69.92,
+              "mean": 67.398,
+              "median": 68.31,
               "stdev": 2.1401
             },
             "duration_distribution": {
@@ -5054,7 +4928,7 @@
                 "start_label": "06:57.53",
                 "end_label": "07:47.13",
                 "duration": 49.6,
-                "local_score": 74.92,
+                "local_score": 69.92,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -5071,7 +4945,7 @@
                 "start_label": "00:55.26",
                 "end_label": "01:34.25",
                 "duration": 38.99,
-                "local_score": 73.73,
+                "local_score": 68.73,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -5088,7 +4962,7 @@
                 "start_label": "10:08.63",
                 "end_label": "10:39.61",
                 "duration": 30.98,
-                "local_score": 73.31,
+                "local_score": 68.31,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -5105,7 +4979,7 @@
                 "start_label": "12:31.65",
                 "end_label": "13:06.09",
                 "duration": 34.44,
-                "local_score": 71.15,
+                "local_score": 66.15,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -5122,7 +4996,7 @@
                 "start_label": "03:28.09",
                 "end_label": "04:02.47",
                 "duration": 34.38,
-                "local_score": 68.88,
+                "local_score": 63.88,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -5148,76 +5022,60 @@
             "fallback_samples": 325,
             "reaction_samples": 0,
             "zoom_samples": 11,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 4,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 4
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 12,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 13,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 9,
                 "speakers": [
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -5266,14 +5124,13 @@
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\putin_parade_commentary\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\putin_parade_commentary\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (commentary) with confidence 0.97.",
         "Subtitle checker reported warnings (0), but no hard failure.",
-        "Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many",
         "All rendered benchmark scenarios produced the requested subtitled clips."
       ]
     },
@@ -5314,25 +5171,50 @@
             1
           ]
         ],
-        "report_path": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 388,
-        "speaker_count": 4,
+        "speaker_count": 2,
         "speaker_distribution": {
-          "Speaker 0": 100,
-          "Speaker 1": 35,
-          "Speaker 2": 138,
-          "Speaker 3": 115
+          "Speaker 0": 171,
+          "Speaker 1": 217
         },
-        "speaker_switches": 191,
-        "dominant_speaker_ratio": 0.3557,
+        "speaker_switches": 99,
+        "dominant_speaker_ratio": 0.5593,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 165.253,
-        "flags": []
+        "pipeline_seconds": 165.086,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 2,
+        "single_speaker_likelihood": 0.08,
+        "multi_speaker_evidence": 0.86,
+        "clusters_merged": 2,
+        "tiny_clusters_removed": 0,
+        "decision_reason": "kept_multi_speaker_clusters",
+        "adjacent_similarity_mean": 0.9273,
+        "top_cluster_similarity": 0.8874,
+        "stable_cluster_count": 2,
+        "alternating_blocks": 99,
+        "raw_cluster_distribution": {
+          "Cluster 3": 198,
+          "Cluster 2": 164,
+          "Cluster 1": 19,
+          "Cluster 0": 5
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 3": 0.5632,
+          "Cluster 2": 0.3738,
+          "Cluster 1": 0.0515,
+          "Cluster 0": 0.0114
+        },
+        "cluster_label_distribution": {
+          "2": 169,
+          "3": 217
+        }
       },
       "scenarios": [
         {
@@ -5357,7 +5239,7 @@
             },
             "features": {
               "segment_count": 388,
-              "speaker_count": 4,
+              "speaker_count": 2,
               "speech_coverage_ratio": 0.8471,
               "avg_segment_duration": 1.8537,
               "median_segment_duration": 1.78,
@@ -5365,9 +5247,9 @@
               "long_segment_ratio": 0.0412,
               "avg_words_per_second": 2.8127,
               "avg_words_per_segment": 5.2139,
-              "speaker_switch_rate_per_minute": 13.4968,
-              "speaker_switch_ratio": 0.4935,
-              "dominant_speaker_ratio": 0.3557,
+              "speaker_switch_rate_per_minute": 6.9957,
+              "speaker_switch_ratio": 0.2558,
+              "dominant_speaker_ratio": 0.5593,
               "chaos_ratio": 0.0773,
               "high_importance_ratio": 0.067,
               "emotion_segment_ratio": 0.6443,
@@ -5382,10 +5264,8 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0206,
               "speaker_distribution": {
-                "Speaker 0": 100,
-                "Speaker 1": 35,
-                "Speaker 2": 138,
-                "Speaker 3": 115
+                "Speaker 0": 171,
+                "Speaker 1": 217
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -5436,33 +5316,34 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 79.05,
+              "min": 78.68,
               "max": 85.18,
-              "mean": 81.938,
-              "median": 81.07,
-              "stdev": 2.6177
+              "mean": 80.688,
+              "median": 79.5,
+              "stdev": 2.3909
             },
             "duration_distribution": {
               "count": 5,
               "min": 32.08,
-              "max": 38.84,
-              "mean": 35.33,
-              "median": 36.0,
-              "stdev": 2.5644
+              "max": 44.18,
+              "mean": 38.12,
+              "median": 37.0,
+              "stdev": 4.2266
             },
             "temporal_metrics": {
-              "earliest_start": 48.36,
+              "earliest_start": 3.08,
               "latest_end": 506.37,
-              "temporal_span_seconds": 458.01,
-              "temporal_coverage_ratio": 0.5353,
-              "min_gap_seconds": 43.66,
-              "mean_gap_seconds": 70.34,
+              "temporal_span_seconds": 503.29,
+              "temporal_coverage_ratio": 0.5882,
+              "min_gap_seconds": 9.52,
+              "mean_gap_seconds": 78.1725,
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
               "has speaker dynamics or conversational turns": 5,
               "good speech density for a short clip": 5,
-              "starts with a stronger hook signal": 5
+              "starts with a stronger hook signal": 4,
+              "ends with a clearer payoff signal": 1
             },
             "clips": [
               {
@@ -5484,23 +5365,6 @@
               },
               {
                 "index": 2,
-                "start": 48.36,
-                "end": 87.2,
-                "start_label": "00:48.36",
-                "end_label": "01:27.20",
-                "duration": 38.84,
-                "local_score": 84.89,
-                "selection_strategy": "podcast",
-                "selection_source": "local_ranking",
-                "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
-                  "good speech density for a short clip",
-                  "starts with a stronger hook signal"
-                ],
-                "summary": "Co ja robię w tej chmurze? w głównej mierze staram się pomóc krajom, czyli u nas w nomenkaturze mówimy na to nadkosi...."
-              },
-              {
-                "index": 3,
                 "start": 469.37,
                 "end": 506.37,
                 "start_label": "07:49.37",
@@ -5517,7 +5381,7 @@
                 "summary": "trochę chyba pracujesz w T-Mobile? Wiesz co, dojcze telekomie pracuje od 17 lat z czego 8 w Niemczech, 9 w Polsce...."
               },
               {
-                "index": 4,
+                "index": 3,
                 "start": 284.78,
                 "end": 316.86,
                 "start_label": "04:44.78",
@@ -5534,21 +5398,38 @@
                 "summary": "To może wysypmy je na środek? Jeżeli nie masz nic przeciwko. Co możemy je wysypać? Tak. Odwróćmy. Odwrócić. Porosujmy, żeby nie było, że jest coś ustawione. Sorry, jeszcze tą ostatnią. Ostatnie nie chcę wyjść...."
               },
               {
-                "index": 5,
-                "start": 392.44,
-                "end": 425.17,
-                "start_label": "06:32.44",
-                "end_label": "07:05.17",
-                "duration": 32.73,
-                "local_score": 79.05,
+                "index": 4,
+                "start": 176.38,
+                "end": 220.56,
+                "start_label": "02:56.38",
+                "end_label": "03:40.56",
+                "duration": 44.18,
+                "local_score": 79.01,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "has speaker dynamics or conversational turns",
-                  "starts with a stronger hook signal",
-                  "good speech density for a short clip"
+                  "good speech density for a short clip",
+                  "starts with a stronger hook signal"
                 ],
-                "summary": "To co, następna karta? To teraz ja lustruję. Jakich kork pospów i skrótów używasz w prac? Okej. A jakich nie używasz? Jakich używam? Bardzo często z racji tego, że jestem w chmurze, więc mamy bardzo dużo skrótów...."
+                "summary": "O co chodzi? Tak naprawdę chodzi o to zarządzanie finansami. że po pierwsze, że mieć pewność, że to co w naszych księgach, wynikach jest, wiemy, co tam się dzieje, że potrafimy tym zarządzić, zamanagować...."
+              },
+              {
+                "index": 5,
+                "start": 3.08,
+                "end": 44.42,
+                "start_label": "00:03.08",
+                "end_label": "00:44.42",
+                "duration": 41.34,
+                "local_score": 78.68,
+                "selection_strategy": "podcast",
+                "selection_source": "local_ranking",
+                "selection_reasons": [
+                  "has speaker dynamics or conversational turns",
+                  "good speech density for a short clip",
+                  "ends with a clearer payoff signal"
+                ],
+                "summary": "Cześć! W Magzenta Team wierzymy, że... Życie to rozmowy. Życie to rozmowy. A najlepsze rzeczy dzieją się wtedy, kiedy zaczynamy ze sobą szczerze gadać...."
               }
             ]
           },
@@ -5562,20 +5443,18 @@
             },
             "face_tracking_success_count": 5,
             "center_fallback_count": 0,
-            "sampled_detections": 408,
-            "fallback_samples": 477,
-            "reaction_samples": 6,
-            "zoom_samples": 14,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\cuts_subtitles",
+            "sampled_detections": 501,
+            "fallback_samples": 453,
+            "reaction_samples": 1,
+            "zoom_samples": 27,
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
               "Speaker 0": 5,
-              "Speaker 2": 4,
-              "Speaker 3": 4,
-              "Speaker 1": 2
+              "Speaker 1": 5
             },
             "multi_speaker_clips": 5,
             "empty_event_clips": 0,
@@ -5585,54 +5464,49 @@
                 "event_count": 10,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 2,
-                "event_count": 9,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 3,
-                "event_count": 16,
+                "event_count": 14,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 4,
-                "event_count": 14,
+                "event_count": 17,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 5,
-                "event_count": 15,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\auto\\cuts_subtitles"
           }
         },
         {
@@ -5651,7 +5525,7 @@
             },
             "features": {
               "segment_count": 388,
-              "speaker_count": 4,
+              "speaker_count": 2,
               "speech_coverage_ratio": 0.8471,
               "avg_segment_duration": 1.8537,
               "median_segment_duration": 1.78,
@@ -5659,9 +5533,9 @@
               "long_segment_ratio": 0.0412,
               "avg_words_per_second": 2.8127,
               "avg_words_per_segment": 5.2139,
-              "speaker_switch_rate_per_minute": 13.4968,
-              "speaker_switch_ratio": 0.4935,
-              "dominant_speaker_ratio": 0.3557,
+              "speaker_switch_rate_per_minute": 6.9957,
+              "speaker_switch_ratio": 0.2558,
+              "dominant_speaker_ratio": 0.5593,
               "chaos_ratio": 0.0773,
               "high_importance_ratio": 0.067,
               "emotion_segment_ratio": 0.6443,
@@ -5676,10 +5550,8 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0206,
               "speaker_distribution": {
-                "Speaker 0": 100,
-                "Speaker 1": 35,
-                "Speaker 2": 138,
-                "Speaker 3": 115
+                "Speaker 0": 171,
+                "Speaker 1": 217
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -5730,33 +5602,34 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 79.05,
+              "min": 78.68,
               "max": 85.18,
-              "mean": 81.938,
-              "median": 81.07,
-              "stdev": 2.6177
+              "mean": 80.688,
+              "median": 79.5,
+              "stdev": 2.3909
             },
             "duration_distribution": {
               "count": 5,
               "min": 32.08,
-              "max": 38.84,
-              "mean": 35.33,
-              "median": 36.0,
-              "stdev": 2.5644
+              "max": 44.18,
+              "mean": 38.12,
+              "median": 37.0,
+              "stdev": 4.2266
             },
             "temporal_metrics": {
-              "earliest_start": 48.36,
+              "earliest_start": 3.08,
               "latest_end": 506.37,
-              "temporal_span_seconds": 458.01,
-              "temporal_coverage_ratio": 0.5353,
-              "min_gap_seconds": 43.66,
-              "mean_gap_seconds": 70.34,
+              "temporal_span_seconds": 503.29,
+              "temporal_coverage_ratio": 0.5882,
+              "min_gap_seconds": 9.52,
+              "mean_gap_seconds": 78.1725,
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
               "has speaker dynamics or conversational turns": 5,
               "good speech density for a short clip": 5,
-              "starts with a stronger hook signal": 5
+              "starts with a stronger hook signal": 4,
+              "ends with a clearer payoff signal": 1
             },
             "clips": [
               {
@@ -5778,23 +5651,6 @@
               },
               {
                 "index": 2,
-                "start": 48.36,
-                "end": 87.2,
-                "start_label": "00:48.36",
-                "end_label": "01:27.20",
-                "duration": 38.84,
-                "local_score": 84.89,
-                "selection_strategy": "podcast",
-                "selection_source": "local_ranking",
-                "selection_reasons": [
-                  "has speaker dynamics or conversational turns",
-                  "good speech density for a short clip",
-                  "starts with a stronger hook signal"
-                ],
-                "summary": "Co ja robię w tej chmurze? w głównej mierze staram się pomóc krajom, czyli u nas w nomenkaturze mówimy na to nadkosi...."
-              },
-              {
-                "index": 3,
                 "start": 469.37,
                 "end": 506.37,
                 "start_label": "07:49.37",
@@ -5811,7 +5667,7 @@
                 "summary": "trochę chyba pracujesz w T-Mobile? Wiesz co, dojcze telekomie pracuje od 17 lat z czego 8 w Niemczech, 9 w Polsce...."
               },
               {
-                "index": 4,
+                "index": 3,
                 "start": 284.78,
                 "end": 316.86,
                 "start_label": "04:44.78",
@@ -5828,21 +5684,38 @@
                 "summary": "To może wysypmy je na środek? Jeżeli nie masz nic przeciwko. Co możemy je wysypać? Tak. Odwróćmy. Odwrócić. Porosujmy, żeby nie było, że jest coś ustawione. Sorry, jeszcze tą ostatnią. Ostatnie nie chcę wyjść...."
               },
               {
-                "index": 5,
-                "start": 392.44,
-                "end": 425.17,
-                "start_label": "06:32.44",
-                "end_label": "07:05.17",
-                "duration": 32.73,
-                "local_score": 79.05,
+                "index": 4,
+                "start": 176.38,
+                "end": 220.56,
+                "start_label": "02:56.38",
+                "end_label": "03:40.56",
+                "duration": 44.18,
+                "local_score": 79.01,
                 "selection_strategy": "podcast",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "has speaker dynamics or conversational turns",
-                  "starts with a stronger hook signal",
-                  "good speech density for a short clip"
+                  "good speech density for a short clip",
+                  "starts with a stronger hook signal"
                 ],
-                "summary": "To co, następna karta? To teraz ja lustruję. Jakich kork pospów i skrótów używasz w prac? Okej. A jakich nie używasz? Jakich używam? Bardzo często z racji tego, że jestem w chmurze, więc mamy bardzo dużo skrótów...."
+                "summary": "O co chodzi? Tak naprawdę chodzi o to zarządzanie finansami. że po pierwsze, że mieć pewność, że to co w naszych księgach, wynikach jest, wiemy, co tam się dzieje, że potrafimy tym zarządzić, zamanagować...."
+              },
+              {
+                "index": 5,
+                "start": 3.08,
+                "end": 44.42,
+                "start_label": "00:03.08",
+                "end_label": "00:44.42",
+                "duration": 41.34,
+                "local_score": 78.68,
+                "selection_strategy": "podcast",
+                "selection_source": "local_ranking",
+                "selection_reasons": [
+                  "has speaker dynamics or conversational turns",
+                  "good speech density for a short clip",
+                  "ends with a clearer payoff signal"
+                ],
+                "summary": "Cześć! W Magzenta Team wierzymy, że... Życie to rozmowy. Życie to rozmowy. A najlepsze rzeczy dzieją się wtedy, kiedy zaczynamy ze sobą szczerze gadać...."
               }
             ]
           },
@@ -5856,20 +5729,18 @@
             },
             "face_tracking_success_count": 5,
             "center_fallback_count": 0,
-            "sampled_detections": 408,
-            "fallback_samples": 477,
-            "reaction_samples": 6,
-            "zoom_samples": 14,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\cuts_subtitles",
+            "sampled_detections": 501,
+            "fallback_samples": 453,
+            "reaction_samples": 1,
+            "zoom_samples": 27,
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
               "Speaker 0": 5,
-              "Speaker 2": 4,
-              "Speaker 3": 4,
-              "Speaker 1": 2
+              "Speaker 1": 5
             },
             "multi_speaker_clips": 5,
             "empty_event_clips": 0,
@@ -5879,54 +5750,49 @@
                 "event_count": 10,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 2,
-                "event_count": 9,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 3,
-                "event_count": 16,
+                "event_count": 14,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 4,
-                "event_count": 14,
+                "event_count": 17,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 5,
-                "event_count": 15,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\manual_podcast\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\manual_podcast\\cuts_subtitles"
           }
         },
         {
@@ -5945,7 +5811,7 @@
             },
             "features": {
               "segment_count": 388,
-              "speaker_count": 4,
+              "speaker_count": 2,
               "speech_coverage_ratio": 0.8471,
               "avg_segment_duration": 1.8537,
               "median_segment_duration": 1.78,
@@ -5953,9 +5819,9 @@
               "long_segment_ratio": 0.0412,
               "avg_words_per_second": 2.8127,
               "avg_words_per_segment": 5.2139,
-              "speaker_switch_rate_per_minute": 13.4968,
-              "speaker_switch_ratio": 0.4935,
-              "dominant_speaker_ratio": 0.3557,
+              "speaker_switch_rate_per_minute": 6.9957,
+              "speaker_switch_ratio": 0.2558,
+              "dominant_speaker_ratio": 0.5593,
               "chaos_ratio": 0.0773,
               "high_importance_ratio": 0.067,
               "emotion_segment_ratio": 0.6443,
@@ -5970,10 +5836,8 @@
               "commentary_segment_ratio": 0.0,
               "qa_turn_ratio": 0.0206,
               "speaker_distribution": {
-                "Speaker 0": 100,
-                "Speaker 1": 35,
-                "Speaker 2": 138,
-                "Speaker 3": 115
+                "Speaker 0": 171,
+                "Speaker 1": 217
               },
               "heatmap_mean": 0.5,
               "heatmap_peak": 0.5,
@@ -6023,56 +5887,39 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 77.65,
-              "max": 81.0,
-              "mean": 79.324,
-              "median": 79.34,
-              "stdev": 1.2133
+              "min": 75.91,
+              "max": 80.25,
+              "mean": 78.008,
+              "median": 78.38,
+              "stdev": 1.7179
             },
             "duration_distribution": {
               "count": 5,
               "min": 32.08,
-              "max": 44.5,
-              "mean": 36.462,
-              "median": 36.0,
-              "stdev": 4.4327
+              "max": 41.34,
+              "mean": 37.052,
+              "median": 37.0,
+              "stdev": 3.0794
             },
             "temporal_metrics": {
-              "earliest_start": 42.7,
+              "earliest_start": 3.08,
               "latest_end": 506.37,
-              "temporal_span_seconds": 463.67,
-              "temporal_coverage_ratio": 0.5419,
-              "min_gap_seconds": 43.66,
-              "mean_gap_seconds": 70.34,
+              "temporal_span_seconds": 503.29,
+              "temporal_coverage_ratio": 0.5882,
+              "min_gap_seconds": 3.94,
+              "mean_gap_seconds": 79.5075,
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
               "contains punchy or emotional language": 5,
-              "starts with a stronger hook signal": 5,
-              "contains high-importance transcript moments": 3,
-              "ends with a clearer payoff signal": 1,
-              "good speech density for a short clip": 1
+              "starts with a stronger hook signal": 4,
+              "good speech density for a short clip": 2,
+              "contains high-importance transcript moments": 2,
+              "ends with a clearer payoff signal": 2
             },
             "clips": [
               {
                 "index": 1,
-                "start": 42.7,
-                "end": 87.2,
-                "start_label": "00:42.70",
-                "end_label": "01:27.20",
-                "duration": 44.5,
-                "local_score": 81.0,
-                "selection_strategy": "generic",
-                "selection_source": "local_ranking",
-                "selection_reasons": [
-                  "contains punchy or emotional language",
-                  "starts with a stronger hook signal",
-                  "ends with a clearer payoff signal"
-                ],
-                "summary": "Co się dzieje z tą chmurą? Co to jest? Chmura jest. A co robisz w tej chmurze? Co ja robię w tej chmurze? w głównej mierze staram się pomóc krajom, czyli u nas w nomenkaturze mówimy na to nadkosi...."
-              },
-              {
-                "index": 2,
                 "start": 130.86,
                 "end": 166.86,
                 "start_label": "02:10.86",
@@ -6089,7 +5936,7 @@
                 "summary": "A ty jak często jesteś w Bonn? Ja jestem, jak już wspomniałem, dyrektorem kontrolingu...."
               },
               {
-                "index": 3,
+                "index": 2,
                 "start": 469.37,
                 "end": 506.37,
                 "start_label": "07:49.37",
@@ -6106,7 +5953,7 @@
                 "summary": "trochę chyba pracujesz w T-Mobile? Wiesz co, dojcze telekomie pracuje od 17 lat z czego 8 w Niemczech, 9 w Polsce...."
               },
               {
-                "index": 4,
+                "index": 3,
                 "start": 284.78,
                 "end": 316.86,
                 "start_label": "04:44.78",
@@ -6123,21 +5970,38 @@
                 "summary": "To może wysypmy je na środek? Jeżeli nie masz nic przeciwko. Co możemy je wysypać? Tak. Odwróćmy. Odwrócić. Porosujmy, żeby nie było, że jest coś ustawione. Sorry, jeszcze tą ostatnią. Ostatnie nie chcę wyjść...."
               },
               {
-                "index": 5,
-                "start": 392.44,
-                "end": 425.17,
-                "start_label": "06:32.44",
-                "end_label": "07:05.17",
-                "duration": 32.73,
-                "local_score": 77.65,
+                "index": 4,
+                "start": 3.08,
+                "end": 44.42,
+                "start_label": "00:03.08",
+                "end_label": "00:44.42",
+                "duration": 41.34,
+                "local_score": 76.16,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "contains punchy or emotional language",
-                  "contains high-importance transcript moments",
-                  "starts with a stronger hook signal"
+                  "good speech density for a short clip",
+                  "ends with a clearer payoff signal"
                 ],
-                "summary": "To co, następna karta? To teraz ja lustruję. Jakich kork pospów i skrótów używasz w prac? Okej. A jakich nie używasz? Jakich używam? Bardzo często z racji tego, że jestem w chmurze, więc mamy bardzo dużo skrótów...."
+                "summary": "Cześć! W Magzenta Team wierzymy, że... Życie to rozmowy. Życie to rozmowy. A najlepsze rzeczy dzieją się wtedy, kiedy zaczynamy ze sobą szczerze gadać...."
+              },
+              {
+                "index": 5,
+                "start": 48.36,
+                "end": 87.2,
+                "start_label": "00:48.36",
+                "end_label": "01:27.20",
+                "duration": 38.84,
+                "local_score": 75.91,
+                "selection_strategy": "generic",
+                "selection_source": "local_ranking",
+                "selection_reasons": [
+                  "contains punchy or emotional language",
+                  "starts with a stronger hook signal",
+                  "ends with a clearer payoff signal"
+                ],
+                "summary": "Co ja robię w tej chmurze? w głównej mierze staram się pomóc krajom, czyli u nas w nomenkaturze mówimy na to nadkosi...."
               }
             ]
           },
@@ -6151,77 +6015,69 @@
             },
             "face_tracking_success_count": 5,
             "center_fallback_count": 0,
-            "sampled_detections": 424,
-            "fallback_samples": 489,
-            "reaction_samples": 6,
-            "zoom_samples": 14,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\cuts_subtitles",
+            "sampled_detections": 457,
+            "fallback_samples": 471,
+            "reaction_samples": 1,
+            "zoom_samples": 13,
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 3": 4,
-              "Speaker 2": 4,
-              "Speaker 1": 2
+              "Speaker 0": 4,
+              "Speaker 1": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 4,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
-                "event_count": 11,
+                "event_count": 10,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 2,
-                "event_count": 10,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 3,
-                "event_count": 16,
+                "event_count": 14,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 4,
-                "event_count": 14,
+                "event_count": 16,
                 "speakers": [
                   "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2"
+                  "Speaker 1"
                 ]
               },
               {
                 "index": 5,
-                "event_count": 15,
+                "event_count": 9,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 1"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -6237,21 +6093,21 @@
           "left": "auto",
           "right": "compare_generic",
           "top_n": 5,
-          "overlap_count": 5,
-          "overlap_ratio": 1.0
+          "overlap_count": 4,
+          "overlap_ratio": 0.8
         },
         {
           "left": "manual_podcast",
           "right": "compare_generic",
           "top_n": 5,
-          "overlap_count": 5,
-          "overlap_ratio": 1.0
+          "overlap_count": 4,
+          "overlap_ratio": 0.8
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\magenta_team_podcast\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\magenta_team_podcast\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (podcast) with confidence 0.8881.",
@@ -6292,27 +6148,48 @@
             1
           ]
         ],
-        "report_path": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\shared\\subtitle_check_report.json"
+        "report_path": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\shared\\subtitle_check_report.json"
       },
       "transcript_metrics": {
         "segment_count": 826,
-        "speaker_count": 4,
+        "speaker_count": 1,
         "speaker_distribution": {
-          "Speaker 0": 194,
-          "Speaker 1": 199,
-          "Speaker 2": 225,
-          "Speaker 3": 208
+          "Speaker 0": 826
         },
-        "speaker_switches": 524,
-        "dominant_speaker_ratio": 0.2724,
+        "speaker_switches": 0,
+        "dominant_speaker_ratio": 1.0,
         "diarization_status": "applied",
         "diarization_used_fallback": false,
         "transcription_backend": "faster_whisper",
         "diarization_backend": "heuristic_cluster",
-        "pipeline_seconds": 291.041,
-        "flags": [
-          "expected_single_speaker_but_detected_many"
-        ]
+        "pipeline_seconds": 290.982,
+        "flags": [],
+        "raw_cluster_count": 4,
+        "final_speaker_count": 1,
+        "single_speaker_likelihood": 0.7,
+        "multi_speaker_evidence": 0.46,
+        "clusters_merged": 0,
+        "tiny_clusters_removed": 0,
+        "decision_reason": "collapsed_to_single_speaker_due_to_weak_multi_evidence",
+        "adjacent_similarity_mean": 0.9554,
+        "top_cluster_similarity": 0.964,
+        "stable_cluster_count": 2,
+        "alternating_blocks": 365,
+        "raw_cluster_distribution": {
+          "Cluster 0": 480,
+          "Cluster 1": 195,
+          "Cluster 2": 113,
+          "Cluster 3": 36
+        },
+        "raw_cluster_duration_share": {
+          "Cluster 0": 0.5561,
+          "Cluster 1": 0.2116,
+          "Cluster 2": 0.1514,
+          "Cluster 3": 0.0808
+        },
+        "cluster_label_distribution": {
+          "0": 824
+        }
       },
       "scenarios": [
         {
@@ -6337,7 +6214,7 @@
             },
             "features": {
               "segment_count": 826,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.938,
               "avg_segment_duration": 1.9865,
               "median_segment_duration": 1.88,
@@ -6345,9 +6222,9 @@
               "long_segment_ratio": 0.0424,
               "avg_words_per_second": 2.3359,
               "avg_words_per_segment": 4.6404,
-              "speaker_switch_rate_per_minute": 17.9724,
-              "speaker_switch_ratio": 0.6352,
-              "dominant_speaker_ratio": 0.2724,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0085,
               "high_importance_ratio": 0.0291,
               "emotion_segment_ratio": 0.5969,
@@ -6362,10 +6239,7 @@
               "commentary_segment_ratio": 0.0012,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 194,
-                "Speaker 1": 199,
-                "Speaker 2": 225,
-                "Speaker 3": 208
+                "Speaker 0": 826
               },
               "heatmap_mean": 0.3467,
               "heatmap_peak": 1.0,
@@ -6416,10 +6290,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 64.9,
-              "max": 67.14,
-              "mean": 66.316,
-              "median": 66.6,
+              "min": 60.9,
+              "max": 63.14,
+              "mean": 62.316,
+              "median": 62.6,
               "stdev": 0.7915
             },
             "duration_distribution": {
@@ -6453,7 +6327,7 @@
                 "start_label": "07:31.31",
                 "end_label": "08:07.91",
                 "duration": 36.6,
-                "local_score": 67.14,
+                "local_score": 63.14,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6470,7 +6344,7 @@
                 "start_label": "25:46.46",
                 "end_label": "26:22.20",
                 "duration": 35.74,
-                "local_score": 66.87,
+                "local_score": 62.87,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6487,7 +6361,7 @@
                 "start_label": "09:56.17",
                 "end_label": "10:31.10",
                 "duration": 34.93,
-                "local_score": 66.6,
+                "local_score": 62.6,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6504,7 +6378,7 @@
                 "start_label": "17:25.96",
                 "end_label": "18:01.94",
                 "duration": 35.98,
-                "local_score": 66.07,
+                "local_score": 62.07,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6521,7 +6395,7 @@
                 "start_label": "26:55.86",
                 "end_label": "27:31.62",
                 "duration": 35.76,
-                "local_score": 64.9,
+                "local_score": 60.9,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6547,78 +6421,60 @@
             "fallback_samples": 1075,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 17,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\auto\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\auto\\cuts_subtitles"
           }
         },
         {
@@ -6637,7 +6493,7 @@
             },
             "features": {
               "segment_count": 826,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.938,
               "avg_segment_duration": 1.9865,
               "median_segment_duration": 1.88,
@@ -6645,9 +6501,9 @@
               "long_segment_ratio": 0.0424,
               "avg_words_per_second": 2.3359,
               "avg_words_per_segment": 4.6404,
-              "speaker_switch_rate_per_minute": 17.9724,
-              "speaker_switch_ratio": 0.6352,
-              "dominant_speaker_ratio": 0.2724,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0085,
               "high_importance_ratio": 0.0291,
               "emotion_segment_ratio": 0.5969,
@@ -6662,10 +6518,7 @@
               "commentary_segment_ratio": 0.0012,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 194,
-                "Speaker 1": 199,
-                "Speaker 2": 225,
-                "Speaker 3": 208
+                "Speaker 0": 826
               },
               "heatmap_mean": 0.3467,
               "heatmap_peak": 1.0,
@@ -6716,10 +6569,10 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 64.9,
-              "max": 67.14,
-              "mean": 66.316,
-              "median": 66.6,
+              "min": 60.9,
+              "max": 63.14,
+              "mean": 62.316,
+              "median": 62.6,
               "stdev": 0.7915
             },
             "duration_distribution": {
@@ -6753,7 +6606,7 @@
                 "start_label": "07:31.31",
                 "end_label": "08:07.91",
                 "duration": 36.6,
-                "local_score": 67.14,
+                "local_score": 63.14,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6770,7 +6623,7 @@
                 "start_label": "25:46.46",
                 "end_label": "26:22.20",
                 "duration": 35.74,
-                "local_score": 66.87,
+                "local_score": 62.87,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6787,7 +6640,7 @@
                 "start_label": "09:56.17",
                 "end_label": "10:31.10",
                 "duration": 34.93,
-                "local_score": 66.6,
+                "local_score": 62.6,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6804,7 +6657,7 @@
                 "start_label": "17:25.96",
                 "end_label": "18:01.94",
                 "duration": 35.98,
-                "local_score": 66.07,
+                "local_score": 62.07,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6821,7 +6674,7 @@
                 "start_label": "26:55.86",
                 "end_label": "27:31.62",
                 "duration": 35.76,
-                "local_score": 64.9,
+                "local_score": 60.9,
                 "selection_strategy": "tutorial",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -6847,78 +6700,60 @@
             "fallback_samples": 1075,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 17,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 20,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\manual_tutorial\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\manual_tutorial\\cuts_subtitles"
           }
         },
         {
@@ -6937,7 +6772,7 @@
             },
             "features": {
               "segment_count": 826,
-              "speaker_count": 4,
+              "speaker_count": 1,
               "speech_coverage_ratio": 0.938,
               "avg_segment_duration": 1.9865,
               "median_segment_duration": 1.88,
@@ -6945,9 +6780,9 @@
               "long_segment_ratio": 0.0424,
               "avg_words_per_second": 2.3359,
               "avg_words_per_segment": 4.6404,
-              "speaker_switch_rate_per_minute": 17.9724,
-              "speaker_switch_ratio": 0.6352,
-              "dominant_speaker_ratio": 0.2724,
+              "speaker_switch_rate_per_minute": 0.0,
+              "speaker_switch_ratio": 0.0,
+              "dominant_speaker_ratio": 1.0,
               "chaos_ratio": 0.0085,
               "high_importance_ratio": 0.0291,
               "emotion_segment_ratio": 0.5969,
@@ -6962,10 +6797,7 @@
               "commentary_segment_ratio": 0.0012,
               "qa_turn_ratio": 0.0,
               "speaker_distribution": {
-                "Speaker 0": 194,
-                "Speaker 1": 199,
-                "Speaker 2": 225,
-                "Speaker 3": 208
+                "Speaker 0": 826
               },
               "heatmap_mean": 0.3467,
               "heatmap_peak": 1.0,
@@ -7015,34 +6847,34 @@
             "clip_count": 5,
             "score_distribution": {
               "count": 5,
-              "min": 66.0,
-              "max": 73.31,
-              "mean": 71.008,
-              "median": 71.49,
-              "stdev": 2.6169
+              "min": 61.11,
+              "max": 68.31,
+              "mean": 66.03,
+              "median": 66.49,
+              "stdev": 2.5748
             },
             "duration_distribution": {
               "count": 5,
-              "min": 34.6,
-              "max": 37.17,
-              "mean": 35.808,
-              "median": 35.74,
-              "stdev": 0.9713
+              "min": 34.93,
+              "max": 39.96,
+              "mean": 36.88,
+              "median": 36.6,
+              "stdev": 1.7176
             },
             "temporal_metrics": {
-              "earliest_start": 451.31,
+              "earliest_start": 167.91,
               "latest_end": 1582.2,
-              "temporal_span_seconds": 1130.89,
-              "temporal_coverage_ratio": 0.6435,
-              "min_gap_seconds": 12.94,
-              "mean_gap_seconds": 237.9625,
+              "temporal_span_seconds": 1414.29,
+              "temporal_coverage_ratio": 0.8047,
+              "min_gap_seconds": 13.35,
+              "mean_gap_seconds": 307.4725,
               "redundant_pairs": 0
             },
             "selection_reason_counts": {
               "strong heatmap support": 5,
-              "contains high-importance transcript moments": 5,
+              "contains high-importance transcript moments": 4,
               "contains punchy or emotional language": 3,
-              "good speech density for a short clip": 2
+              "good speech density for a short clip": 3
             },
             "clips": [
               {
@@ -7052,7 +6884,7 @@
                 "start_label": "07:31.31",
                 "end_label": "08:07.91",
                 "duration": 36.6,
-                "local_score": 73.31,
+                "local_score": 68.31,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -7069,7 +6901,7 @@
                 "start_label": "09:05.65",
                 "end_label": "09:42.82",
                 "duration": 37.17,
-                "local_score": 72.88,
+                "local_score": 67.88,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -7086,7 +6918,7 @@
                 "start_label": "09:56.17",
                 "end_label": "10:31.10",
                 "duration": 34.93,
-                "local_score": 71.49,
+                "local_score": 66.49,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -7103,7 +6935,7 @@
                 "start_label": "25:46.46",
                 "end_label": "26:22.20",
                 "duration": 35.74,
-                "local_score": 71.36,
+                "local_score": 66.36,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
@@ -7115,20 +6947,20 @@
               },
               {
                 "index": 5,
-                "start": 1498.92,
-                "end": 1533.52,
-                "start_label": "24:58.92",
-                "end_label": "25:33.52",
-                "duration": 34.6,
-                "local_score": 66.0,
+                "start": 167.91,
+                "end": 207.87,
+                "start_label": "02:47.91",
+                "end_label": "03:27.87",
+                "duration": 39.96,
+                "local_score": 61.11,
                 "selection_strategy": "generic",
                 "selection_source": "local_ranking",
                 "selection_reasons": [
                   "strong heatmap support",
                   "contains punchy or emotional language",
-                  "contains high-importance transcript moments"
+                  "good speech density for a short clip"
                 ],
-                "summary": "jak bym chciała na przykład dodać animacji do takiego tekstu to znowu zaznaczam go klikam animacja i wybieram po prostu jaką animację chcę zastosować do danego elementu więc tak możesz się pobawić z każdym slajdem i co j..."
+                "summary": "Jeżeli chcesz szybko zobaczyć, jak wygląda od środka taka prezentacja, to wystarczy, że najedziesz myszką bez klikania w dane szablon, ta prezentacja będzie ci się automatycznie przewijać i zobaczysz tutaj ile jest slajd..."
               }
             ]
           },
@@ -7143,81 +6975,63 @@
             "face_tracking_success_count": 5,
             "center_fallback_count": 0,
             "sampled_detections": 1,
-            "fallback_samples": 1075,
+            "fallback_samples": 1107,
             "reaction_samples": 0,
             "zoom_samples": 0,
-            "raw_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\cuts_raw",
-            "subtitle_output_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\cuts_subtitles",
+            "raw_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\cuts_raw",
+            "subtitle_output_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\cuts_subtitles",
             "skipped": false
           },
           "subtitles": {
             "speaker_styles_used": {
-              "Speaker 0": 5,
-              "Speaker 1": 5,
-              "Speaker 2": 5,
-              "Speaker 3": 5
+              "Speaker 0": 5
             },
-            "multi_speaker_clips": 5,
+            "multi_speaker_clips": 0,
             "empty_event_clips": 0,
             "clip_event_summary": [
               {
                 "index": 1,
                 "event_count": 18,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 2,
                 "event_count": 19,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 3,
                 "event_count": 16,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 4,
                 "event_count": 17,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               },
               {
                 "index": 5,
-                "event_count": 18,
+                "event_count": 12,
                 "speakers": [
-                  "Speaker 0",
-                  "Speaker 1",
-                  "Speaker 2",
-                  "Speaker 3"
+                  "Speaker 0"
                 ]
               }
             ]
           },
           "artifacts": {
-            "windows": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\top_windows.json",
-            "cutting_log": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\cutting_logic.json",
-            "content_profile": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\content_profile.json",
-            "raw_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\cuts_raw",
-            "subtitle_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\compare_generic\\cuts_subtitles"
+            "windows": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\top_windows.json",
+            "cutting_log": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\cutting_logic.json",
+            "content_profile": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\content_profile.json",
+            "raw_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\cuts_raw",
+            "subtitle_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\compare_generic\\cuts_subtitles"
           }
         }
       ],
@@ -7245,14 +7059,13 @@
         }
       ],
       "artifacts": {
-        "case_dir": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial",
-        "shared_transcript": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\shared\\transcript.json",
-        "shared_heatmap": "benchmarks\\runs\\20260511_133331\\canva_presentation_tutorial\\shared\\heatmap.json"
+        "case_dir": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial",
+        "shared_transcript": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\shared\\transcript.json",
+        "shared_heatmap": "benchmarks\\runs\\20260511_152536\\canva_presentation_tutorial\\shared\\heatmap.json"
       },
       "findings": [
         "Auto classification matched the expected type (tutorial) with confidence 0.97.",
         "Subtitle checker reported warnings (1), but no hard failure.",
-        "Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many",
         "Face-aware rendering completed, but actual face detections were sparse (1/1076 sampled checks), so this benchmark does not strongly validate facecam tracking quality.",
         "All rendered benchmark scenarios produced the requested subtitled clips."
       ]
@@ -7265,9 +7078,9 @@
     "tutorial"
   ],
   "recommendation": {
-    "next_step": "improve_diarization",
-    "title": "Improve diarization quality on multi-speaker material",
-    "reason": "Transcript diagnostics still show suspicious speaker attribution patterns in benchmark cases."
+    "next_step": "tune_selection_weights",
+    "title": "Tune local scoring weights per content type",
+    "reason": "Routing and rendering look stable enough, so the highest leverage next iteration is fine-tuning clip scoring and strategy weights with human review data."
   },
   "human_review_template": "benchmarks\\human_review_template.csv"
 }
