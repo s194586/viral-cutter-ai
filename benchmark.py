@@ -1197,6 +1197,55 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
             lines.append(f"| {case['label']} | `{case['expected_content_type']}` | n/a | n/a | no run | n/a |")
     lines.append("")
 
+    completed_cases = [case for case in report_payload["cases"] if case.get("status") == "completed"]
+    generic_cases = [case for case in completed_cases if case.get("expected_content_type") == "generic"]
+    podcast_cases = [case for case in completed_cases if case.get("expected_content_type") == "podcast"]
+    tutorial_cases = [case for case in completed_cases if case.get("expected_content_type") == "tutorial"]
+    commentary_as_podcast = 0
+    podcast_correct = 0
+    tutorial_correct = 0
+    single_speaker_oversegmented = 0
+    for case in generic_cases:
+        auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
+        if auto and auto.get("status") == "completed":
+            if auto.get("classification", {}).get("detected_content_type") == "podcast":
+                commentary_as_podcast += 1
+    for case in podcast_cases:
+        auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
+        if auto and auto.get("status") == "completed":
+            if auto.get("classification", {}).get("detected_content_type") == "podcast":
+                podcast_correct += 1
+    for case in tutorial_cases:
+        auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
+        if auto and auto.get("status") == "completed":
+            if auto.get("classification", {}).get("detected_content_type") == "tutorial":
+                tutorial_correct += 1
+    for case in completed_cases:
+        if case.get("expected_speaker_mode") == "single":
+            flags = case.get("transcript_metrics", {}).get("flags") or []
+            if "expected_single_speaker_but_detected_many" in flags:
+                single_speaker_oversegmented += 1
+
+    lines.append("## Key Observations")
+    lines.append("")
+    if generic_cases:
+        lines.append(
+            f"- Commentary / generic cases routed to `podcast` in `{commentary_as_podcast}/{len(generic_cases)}` cases."
+        )
+    if podcast_cases:
+        lines.append(
+            f"- True podcast cases classified correctly as `podcast`: `{podcast_correct}/{len(podcast_cases)}`."
+        )
+    if tutorial_cases:
+        lines.append(
+            f"- True tutorial cases classified correctly as `tutorial`: `{tutorial_correct}/{len(tutorial_cases)}`."
+        )
+    if single_speaker_oversegmented:
+        lines.append(
+            f"- Expected single-speaker materials flagged as over-segmented by diarization: `{single_speaker_oversegmented}`."
+        )
+    lines.append("")
+
     for case in report_payload["cases"]:
         lines.append(f"## {case['label']}")
         lines.append("")

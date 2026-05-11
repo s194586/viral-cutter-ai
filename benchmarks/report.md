@@ -1,11 +1,11 @@
 # AI-Virtual-Cutter Benchmark Report
 
-- Generated at: `2026-05-10T18:27:30.564840+00:00`
-- Run id: `20260510_171633`
+- Generated at: `2026-05-11T02:16:18.683251+00:00`
+- Run id: `20260511_005600`
 - AI mode: `local_only`
 - Subtitle checker mode: `local_only`
 - Legacy media assets in `input/`: `4`
-- Benchmark corpus assets in `benchmarks/assets/`: `6`
+- Benchmark corpus assets in `benchmarks/assets/`: `10`
 - Auxiliary smoke assets: `2`
 
 ## Scope
@@ -14,6 +14,10 @@
 - Legacy input asset: `input\EMERITOS BANDITOS BEZ MVP MAJORA W ESEA INTERMEDIATE!.f251.webm`
 - Legacy input asset: `input\EMERITOS BANDITOS BEZ MVP MAJORA W ESEA INTERMEDIATE!.f399.mp4`
 - Legacy input asset: `input\EMERITOS BANDITOS BEZ MVP MAJORA W ESEA INTERMEDIATE!.mp4`
+- Benchmark corpus asset: `benchmarks\assets\canva_presentation_tutorial\input\source.mp3`
+- Benchmark corpus asset: `benchmarks\assets\canva_presentation_tutorial\input\source.mp4`
+- Benchmark corpus asset: `benchmarks\assets\magenta_team_podcast\input\source.mp3`
+- Benchmark corpus asset: `benchmarks\assets\magenta_team_podcast\input\source.mp4`
 - Benchmark corpus asset: `benchmarks\assets\putin_parade_commentary\input\source.mp3`
 - Benchmark corpus asset: `benchmarks\assets\putin_parade_commentary\input\source.mp4`
 - Benchmark corpus asset: `benchmarks\assets\roman_giertych_commentary\input\source.mp3`
@@ -22,11 +26,9 @@
 - Benchmark corpus asset: `benchmarks\assets\ukraine_war_report\input\source.mp4`
 - Auxiliary smoke asset (not used to claim universality): `tmp\smoke_120s.mp3`
 - Auxiliary smoke asset (not used to claim universality): `tmp\smoke_5s.mp3`
-- Configured benchmark cases: `4`
-- Distinct expected content types tested: `gameplay, generic`
-- This iteration expands the real benchmark corpus from `1` to `4` configured materials.
-- The new additions broaden coverage for `generic` / commentary-like material, but they do not replace missing true `podcast` and `tutorial` benchmarks.
-- Coverage gap: the corpus still does not include a true `podcast` and `tutorial` benchmark case, so universality is still not empirically proven.
+- Configured benchmark cases: `6`
+- Distinct expected content types tested: `gameplay, generic, podcast, tutorial`
+- This iteration expands the real benchmark corpus to `6` configured materials.
 
 ## Classifier Results
 
@@ -36,6 +38,15 @@
 | Ukraine war report commentary | `generic` | `podcast` | 0.76 | no | High speech coverage across the material.; Multiple recurring speakers are present.; No single speaker dominates the full transcript. |
 | Roman Giertych commentary essay | `generic` | `generic` | 0.53 | yes | Keyword evidence is weak, so a generic fallback stays safer. |
 | Putin parade commentary | `generic` | `podcast` | 0.83 | no | High speech coverage across the material.; Utterances are relatively long and conversational.; The transcript contains many longer turns. |
+| Magenta Team two-person podcast | `podcast` | `generic` | 0.50 | no | Signals for gameplay were not strong enough to avoid a safe generic strategy. |
+| Canva presentation tutorial | `tutorial` | `generic` | 0.51 | no | Signals for podcast were not strong enough to avoid a safe generic strategy. |
+
+## Key Observations
+
+- Commentary / generic cases routed to `podcast` in `2/3` cases.
+- True podcast cases classified correctly as `podcast`: `0/1`.
+- True tutorial cases classified correctly as `tutorial`: `0/1`.
+- Expected single-speaker materials flagged as over-segmented by diarization: `4`.
 
 ## EMERITOS BANDITOS gameplay
 
@@ -138,7 +149,7 @@
 - Source URL: https://www.youtube.com/watch?v=5hC0yPPFOYA
 - Description: Single-host war report with map-based commentary and headline-driven analysis. Treated as generic/commentary-like for the current classifier taxonomy.
 - Notes: Added as a generic/commentary benchmark. It is speech-heavy, but it is not a true podcast or tutorial.
-- Transcript preparation: `generated_local_transcript_cpu_fallback_cached`
+- Transcript preparation: `reused_local_transcript`
 - Heatmap source: `existing_heatmap`
 
 ### Transcript / Diarization
@@ -220,7 +231,7 @@
 - Source URL: https://www.youtube.com/watch?v=FheyKl2x73A
 - Description: Single-narrator political commentary / explainer essay with archival visuals. Treated as generic/commentary-like for the current taxonomy.
 - Notes: Added as a generic/commentary benchmark. It resembles a narrated commentary video more than a dialogue-driven podcast.
-- Transcript preparation: `generated_local_transcript_cpu_fallback_cached`
+- Transcript preparation: `reused_local_transcript`
 - Heatmap source: `existing_heatmap`
 
 ### Transcript / Diarization
@@ -301,7 +312,7 @@
 - Source URL: https://www.youtube.com/watch?v=7t9yv4d318U
 - Description: Single-host current-events commentary about Russia's parade and Ukraine. Treated as generic/commentary-like for the current taxonomy.
 - Notes: Added as a generic/commentary benchmark. Useful for testing news-like monologue material without introducing a new taxonomy class yet.
-- Transcript preparation: `generated_local_transcript_cpu_fallback_cached`
+- Transcript preparation: `reused_local_transcript`
 - Heatmap source: `existing_heatmap`
 
 ### Transcript / Diarization
@@ -374,12 +385,175 @@
 - Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many
 - All rendered benchmark scenarios produced the requested subtitled clips.
 
+## Magenta Team two-person podcast
+
+- Expected content type: `podcast`
+- Expected speaker mode: `multi`
+- Status: `completed`
+- Source URL: https://www.youtube.com/watch?v=9Qa-szUnNaY
+- Description: Short branded two-person conversation episode from Magenta Team. Suitable as a real multi-speaker podcast benchmark within the current taxonomy.
+- Notes: Added to validate whether the classifier and diarization behave better on a true conversation than on commentary-like monologues.
+- Transcript preparation: `reused_local_transcript`
+- Heatmap source: `existing_heatmap`
+
+### Transcript / Diarization
+
+- Segments: `388`
+- Speakers: `4`
+- Speaker switches: `191`
+- Dominant speaker ratio: `0.3557`
+- Diarization status: `applied`
+- Fallback used: `False`
+
+### Subtitle Checker
+
+- Mode: `local_only`
+- Status: `warning`
+- Score: `88.0`
+- Issues: `0` errors, `3` warnings
+- Top issue codes: `TOO_MANY_WORDS_FOR_DURATION` x2, `DUPLICATED_ADJACENT_TEXT` x1
+
+### Strategy Scenarios
+
+| Scenario | Arg | Detected | Confidence | Override ok | Render success | Top-5 overlap note |
+| --- | --- | --- | ---: | --- | --- | --- |
+| auto | `auto` | `generic` | 0.50 | False | True | - |
+| manual_podcast | `podcast` | `podcast` | 1.00 | True | True | 5/5 overlap vs auto |
+| compare_generic | `generic` | `generic` | 1.00 | True | True | 5/5 overlap vs auto |
+
+### Pairwise Overlap
+
+- `auto` vs `manual_podcast`: `5/5` overlapping clips (`1.00`)
+- `auto` vs `compare_generic`: `5/5` overlapping clips (`1.00`)
+- `manual_podcast` vs `compare_generic`: `5/5` overlapping clips (`1.00`)
+
+### Top Clips
+
+#### auto
+
+- `00:42.70 - 01:27.20` | score `81.0` | reasons: contains punchy or emotional language, starts with a stronger hook signal, ends with a clearer payoff signal
+- `02:10.86 - 02:46.86` | score `80.25` | reasons: contains punchy or emotional language, good speech density for a short clip, starts with a stronger hook signal
+- `07:49.37 - 08:26.37` | score `79.34` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+- `04:44.78 - 05:16.86` | score `78.38` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+- `06:32.44 - 07:05.17` | score `77.65` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+
+#### manual_podcast
+
+- `02:10.86 - 02:46.86` | score `85.18` | reasons: has speaker dynamics or conversational turns, good speech density for a short clip, starts with a stronger hook signal
+- `00:48.36 - 01:27.20` | score `84.89` | reasons: has speaker dynamics or conversational turns, good speech density for a short clip, starts with a stronger hook signal
+- `07:49.37 - 08:26.37` | score `81.07` | reasons: has speaker dynamics or conversational turns, starts with a stronger hook signal, good speech density for a short clip
+- `04:44.78 - 05:16.86` | score `79.5` | reasons: has speaker dynamics or conversational turns, starts with a stronger hook signal, good speech density for a short clip
+- `06:32.44 - 07:05.17` | score `79.05` | reasons: has speaker dynamics or conversational turns, starts with a stronger hook signal, good speech density for a short clip
+
+#### compare_generic
+
+- `00:42.70 - 01:27.20` | score `81.0` | reasons: contains punchy or emotional language, starts with a stronger hook signal, ends with a clearer payoff signal
+- `02:10.86 - 02:46.86` | score `80.25` | reasons: contains punchy or emotional language, good speech density for a short clip, starts with a stronger hook signal
+- `07:49.37 - 08:26.37` | score `79.34` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+- `04:44.78 - 05:16.86` | score `78.38` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+- `06:32.44 - 07:05.17` | score `77.65` | reasons: contains punchy or emotional language, contains high-importance transcript moments, starts with a stronger hook signal
+
+### Rendering
+
+- `auto`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`14`
+- `manual_podcast`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`14`
+- `compare_generic`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`14`
+
+### Findings
+
+- Auto classification missed the expected type: generic vs podcast.
+- Subtitle checker reported warnings (3), but no hard failure.
+- All rendered benchmark scenarios produced the requested subtitled clips.
+
+## Canva presentation tutorial
+
+- Expected content type: `tutorial`
+- Expected speaker mode: `single`
+- Status: `completed`
+- Source URL: https://www.youtube.com/watch?v=t9ge2mWHoxU
+- Description: Single-presenter Canva screencast on making engaging presentations. Suitable as a tutorial benchmark with screen-focused visuals and instructional speech.
+- Notes: Added to test the tutorial path before tuning classifier or strategy weights.
+- Transcript preparation: `reused_local_transcript`
+- Heatmap source: `existing_heatmap`
+
+### Transcript / Diarization
+
+- Segments: `826`
+- Speakers: `4`
+- Speaker switches: `524`
+- Dominant speaker ratio: `0.2724`
+- Diarization status: `applied`
+- Fallback used: `False`
+- Diagnostic flags: `expected_single_speaker_but_detected_many`
+
+### Subtitle Checker
+
+- Mode: `local_only`
+- Status: `warning`
+- Score: `96.0`
+- Issues: `0` errors, `1` warnings
+- Top issue codes: `MODEL_ARTIFACT` x1
+
+### Strategy Scenarios
+
+| Scenario | Arg | Detected | Confidence | Override ok | Render success | Top-5 overlap note |
+| --- | --- | --- | ---: | --- | --- | --- |
+| auto | `auto` | `generic` | 0.51 | False | True | - |
+| manual_tutorial | `tutorial` | `tutorial` | 1.00 | True | True | 3/5 overlap vs auto |
+| compare_generic | `generic` | `generic` | 1.00 | True | True | 5/5 overlap vs auto |
+
+### Pairwise Overlap
+
+- `auto` vs `manual_tutorial`: `3/5` overlapping clips (`0.60`)
+- `auto` vs `compare_generic`: `5/5` overlapping clips (`1.00`)
+- `manual_tutorial` vs `compare_generic`: `3/5` overlapping clips (`0.60`)
+
+### Top Clips
+
+#### auto
+
+- `07:31.31 - 08:07.91` | score `73.31` | reasons: strong heatmap support, contains high-importance transcript moments, contains punchy or emotional language
+- `09:05.65 - 09:42.82` | score `72.88` | reasons: strong heatmap support, contains high-importance transcript moments, good speech density for a short clip
+- `09:56.17 - 10:31.10` | score `71.49` | reasons: strong heatmap support, contains punchy or emotional language, contains high-importance transcript moments
+- `25:46.46 - 26:22.20` | score `71.36` | reasons: strong heatmap support, contains high-importance transcript moments, good speech density for a short clip
+- `24:58.92 - 25:33.52` | score `66.0` | reasons: strong heatmap support, contains punchy or emotional language, contains high-importance transcript moments
+
+#### manual_tutorial
+
+- `07:31.31 - 08:07.91` | score `67.14` | reasons: strong heatmap support, stays relatively clear despite overlap risk, good speech density for a short clip
+- `25:46.46 - 26:22.20` | score `66.87` | reasons: strong heatmap support, stays relatively clear despite overlap risk, good speech density for a short clip
+- `09:56.17 - 10:31.10` | score `66.6` | reasons: strong heatmap support, stays relatively clear despite overlap risk, good speech density for a short clip
+- `17:25.96 - 18:01.94` | score `66.07` | reasons: good speech density for a short clip, stays relatively clear despite overlap risk, fits a strong short-form duration window
+- `26:55.86 - 27:31.62` | score `64.9` | reasons: strong heatmap support, good speech density for a short clip, stays relatively clear despite overlap risk
+
+#### compare_generic
+
+- `07:31.31 - 08:07.91` | score `73.31` | reasons: strong heatmap support, contains high-importance transcript moments, contains punchy or emotional language
+- `09:05.65 - 09:42.82` | score `72.88` | reasons: strong heatmap support, contains high-importance transcript moments, good speech density for a short clip
+- `09:56.17 - 10:31.10` | score `71.49` | reasons: strong heatmap support, contains punchy or emotional language, contains high-importance transcript moments
+- `25:46.46 - 26:22.20` | score `71.36` | reasons: strong heatmap support, contains high-importance transcript moments, good speech density for a short clip
+- `24:58.92 - 25:33.52` | score `66.0` | reasons: strong heatmap support, contains punchy or emotional language, contains high-importance transcript moments
+
+### Rendering
+
+- `auto`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`0`
+- `manual_tutorial`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`0`
+- `compare_generic`: render_success=`True`, face_tracking_success=`5`, center_fallback=`0`, zoom_samples=`0`
+
+### Findings
+
+- Auto classification missed the expected type: generic vs tutorial.
+- Subtitle checker reported warnings (1), but no hard failure.
+- Transcript/diarization diagnostics raised flags: expected_single_speaker_but_detected_many
+- Face-aware rendering completed, but actual face detections were sparse (1/1076 sampled checks), so this benchmark does not strongly validate facecam tracking quality.
+- All rendered benchmark scenarios produced the requested subtitled clips.
+
 ## Human Review
 
 - Fill in `benchmarks\human_review_template.csv` with `human_relevance_score`, `human_boundary_score`, `human_crop_score` and notes for each rendered clip.
 
 ## Recommendation
 
-- Next step: `expand_benchmark_corpus`
-- Title: Collect missing podcast and tutorial benchmark materials before tuning algorithms
-- Why: The benchmark still lacks representative coverage for podcast, tutorial. The current corpus is useful for gameplay and generic/commentary-like material, but it still cannot validate whether the cutter is truly universal across all target types.
+- Next step: `improve_classifier`
+- Title: Improve the heuristic content classifier
+- Why: Auto classification accuracy is only 33% across the tested materials, so routing errors are likely to dominate downstream quality.
