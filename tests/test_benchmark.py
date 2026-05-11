@@ -155,6 +155,29 @@ class BenchmarkHelpersTests(unittest.TestCase):
             self.assertEqual(len(cases), 1)
             self.assertEqual(cases[0].expected_speaker_mode, "single")
 
+    def test_load_cases_accepts_commentary_content_type(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base = Path(temp_dir)
+            config_path = base / "cases.json"
+            config_path.write_text(
+                json.dumps(
+                    {
+                        "cases": [
+                            {
+                                "id": "commentary_case",
+                                "expected_content_type": "commentary",
+                                "expected_speaker_mode": "single_speaker",
+                                "video": "clip.mp4",
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            cases = load_cases(config_path)
+            self.assertEqual(len(cases), 1)
+            self.assertEqual(cases[0].expected_content_type, "commentary")
+
 
 if __name__ == "__main__":
     unittest.main()

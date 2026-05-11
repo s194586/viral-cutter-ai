@@ -1,4 +1,5 @@
 from .base import SelectionStrategy
+from .commentary import CommentaryStrategy
 from .generic import GenericStrategy
 from .gameplay import GameplayStrategy
 from .podcast import PodcastStrategy
@@ -6,6 +7,7 @@ from .tutorial import TutorialStrategy
 
 
 STRATEGY_REGISTRY = {
+    "commentary": CommentaryStrategy,
     "generic": GenericStrategy,
     "gameplay": GameplayStrategy,
     "podcast": PodcastStrategy,
@@ -20,6 +22,7 @@ def get_strategy(name: str | None) -> SelectionStrategy:
 
 
 __all__ = [
+    "CommentaryStrategy",
     "GenericStrategy",
     "GameplayStrategy",
     "PodcastStrategy",

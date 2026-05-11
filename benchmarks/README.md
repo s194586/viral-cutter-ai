@@ -107,7 +107,7 @@ After download:
 
 Important notes:
 
-- `expected_content_type` must be one of: `podcast`, `gameplay`, `tutorial`, `generic`
+- `expected_content_type` must be one of: `podcast`, `gameplay`, `tutorial`, `commentary`, `generic`
 - `expected_speaker_mode` should be `single`, `multi`, `single_speaker`, `multi_speaker` or `unknown`
 - if `transcript_source` is omitted, the benchmark will generate a fresh local transcript through `transcribe.py`
 - if neither `heatmap` nor `info_json` is available, the benchmark will generate a placeholder heatmap and flag that limitation in the report

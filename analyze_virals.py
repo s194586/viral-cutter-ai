@@ -1059,7 +1059,7 @@ def parse_args():
         "--content-type",
         default="auto",
         choices=VALID_CONTENT_TYPE_MODES,
-        help="auto, podcast, gameplay, tutorial or generic",
+        help="auto, podcast, gameplay, tutorial, commentary or generic",
     )
     parser.add_argument("--min-duration", type=float, default=30.0, help="Minimum window duration in seconds")
     parser.add_argument("--max-duration", type=float, default=60.0, help="Maximum window duration in seconds")

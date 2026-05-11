@@ -1053,7 +1053,7 @@ Przykłady:
         '--content-type',
         choices=VALID_CONTENT_TYPE_MODES,
         default='auto',
-        help='Typ materiału: auto, podcast, gameplay, tutorial albo generic',
+        help='Typ materiału: auto, podcast, gameplay, tutorial, commentary albo generic',
     )
 
     parser.set_defaults(auto_fix_subtitles=True)

@@ -6,14 +6,16 @@ from dataclasses import dataclass
 import json
 import math
 from pathlib import Path
+import re
 import statistics
 from typing import Any
+import unicodedata
 
 
-VALID_CONTENT_TYPES = ("podcast", "gameplay", "tutorial", "generic")
+VALID_CONTENT_TYPES = ("podcast", "gameplay", "tutorial", "commentary", "generic")
 VALID_CONTENT_TYPE_MODES = ("auto",) + VALID_CONTENT_TYPES
 
-WORD_RE = __import__("re").compile(r"[^\W_]+(?:['-][^\W_]+)*", __import__("re").UNICODE)
+WORD_RE = re.compile(r"[^\W_]+(?:['-][^\W_]+)*", re.UNICODE)
 
 GAMEPLAY_TOKENS = {
     "ace",
@@ -56,36 +58,139 @@ GAMEPLAY_TOKENS = {
 TUTORIAL_TOKENS = {
     "ekran",
     "instalacja",
+    "kanwa",
     "kliknij",
+    "klikamy",
     "krok",
     "menu",
+    "nastepnie",
     "następnie",
     "opcja",
+    "otworz",
     "opcje",
+    "panel",
+    "pokaze",
     "pokażę",
     "pokazuje",
     "poradnik",
+    "prezentacja",
+    "prezentacje",
+    "przycisk",
+    "projekt",
     "potem",
+    "szablon",
+    "szablony",
     "tutorial",
     "tutorialu",
     "ustaw",
     "ustawienia",
+    "utworz",
     "wciśnij",
     "wybierz",
+    "wejdz",
+    "wpisz",
+    "wyswietl",
+    "zaloguj",
+    "zaloz",
+    "zarejestruj",
     "zaznacz",
     "zobacz",
+    "zrob",
 }
 
 PODCAST_TOKENS = {
+    "dialog",
+    "gosc",
     "historia",
+    "opowiesc",
     "myślę",
     "opowieść",
     "odcinek",
+    "podcast",
+    "powiedzial",
     "powiedział",
     "rozmowa",
+    "rozmowy",
     "temat",
     "wspomnienie",
+    "wspomnienia",
 }
+
+COMMENTARY_TOKENS = {
+    "analiza",
+    "armia",
+    "atak",
+    "front",
+    "gospodarka",
+    "kanal",
+    "komentarz",
+    "minister",
+    "panstwo",
+    "parada",
+    "polityka",
+    "prezydent",
+    "premier",
+    "putin",
+    "raport",
+    "rosja",
+    "rosyjski",
+    "rzad",
+    "ukraina",
+    "ukrainski",
+    "wiadomosci",
+    "wojna",
+    "wojsko",
+    "wybory",
+}
+
+DIRECT_ADDRESS_TOKENS = {
+    "ci",
+    "ciebie",
+    "kliknij",
+    "pokaze",
+    "tobie",
+    "twoich",
+    "twoja",
+    "twoje",
+    "twoj",
+    "ty",
+    "wybierz",
+    "zaloguj",
+    "zapraszam",
+}
+
+INSTRUCTION_TOKENS = TUTORIAL_TOKENS | {
+    "kliknij",
+    "klikamy",
+    "krok",
+    "mozemy",
+    "nastepnie",
+    "otworz",
+    "pokaze",
+    "przycisk",
+    "teraz",
+    "utworz",
+    "wejdz",
+    "wpisz",
+    "wybierz",
+    "zaloguj",
+    "zrob",
+}
+
+PODCAST_QUESTION_PREFIXES = (
+    "a co ",
+    "a ty ",
+    "co ",
+    "czy ",
+    "dlaczego ",
+    "jak ",
+    "kiedy ",
+    "kto ",
+    "no ale ",
+    "o co ",
+    "po co ",
+    "to co ",
+)
 
 
 @dataclass
@@ -142,14 +247,20 @@ def normalize_speaker_label(value: Any) -> str:
     text = str(value or "").strip()
     if not text:
         return "Speaker 0"
-    match = __import__("re").search(r"(\d+)", text)
+    match = re.search(r"(\d+)", text)
     if match:
         return f"Speaker {int(match.group(1))}"
     return "Speaker 0"
 
 
+def canonicalize_text(text: str) -> str:
+    lowered = str(text or "").lower()
+    normalized = unicodedata.normalize("NFKD", lowered)
+    return "".join(char for char in normalized if not unicodedata.combining(char))
+
+
 def tokenize(text: str) -> list[str]:
-    return WORD_RE.findall(str(text or "").lower())
+    return [canonicalize_text(token) for token in WORD_RE.findall(str(text or "").lower())]
 
 
 def load_transcript(path_or_data: str | Path | list[dict[str, Any]] | dict[str, Any]) -> list[dict[str, Any]]:
@@ -237,6 +348,11 @@ def extract_transcript_features(transcript_segments: list[dict[str, Any]]) -> di
             "gameplay_keyword_ratio": 0.0,
             "tutorial_keyword_ratio": 0.0,
             "podcast_keyword_ratio": 0.0,
+            "commentary_keyword_ratio": 0.0,
+            "instruction_segment_ratio": 0.0,
+            "direct_address_ratio": 0.0,
+            "commentary_segment_ratio": 0.0,
+            "qa_turn_ratio": 0.0,
             "speaker_distribution": {},
         }
 
@@ -247,26 +363,58 @@ def extract_transcript_features(transcript_segments: list[dict[str, Any]]) -> di
     gameplay_hits = 0
     tutorial_hits = 0
     podcast_hits = 0
+    commentary_hits = 0
     question_count = 0
     exclamation_count = 0
     emotion_segment_count = 0
+    instruction_segment_count = 0
+    direct_address_segment_count = 0
+    commentary_segment_count = 0
+    question_turn_count = 0
     speaker_sequence: list[str] = []
+    segment_tokens: list[list[str]] = []
+    normalized_segments: list[str] = []
 
     for segment in transcript_segments:
         text = segment["text"]
+        normalized_text = canonicalize_text(text)
         tokens = tokenize(text)
+        token_set = set(tokens)
         total_words += len(tokens)
         gameplay_hits += sum(1 for token in tokens if token in GAMEPLAY_TOKENS)
         tutorial_hits += sum(1 for token in tokens if token in TUTORIAL_TOKENS)
         podcast_hits += sum(1 for token in tokens if token in PODCAST_TOKENS)
+        commentary_hits += sum(1 for token in tokens if token in COMMENTARY_TOKENS)
         if "?" in text:
             question_count += 1
         if "!" in text:
             exclamation_count += 1
         if int(segment.get("importance", 3)) >= 4:
             emotion_segment_count += 1
+        if token_set.intersection(INSTRUCTION_TOKENS):
+            instruction_segment_count += 1
+        if token_set.intersection(DIRECT_ADDRESS_TOKENS):
+            direct_address_segment_count += 1
+        if token_set.intersection(COMMENTARY_TOKENS):
+            commentary_segment_count += 1
         if text:
             speaker_sequence.append(segment["speaker"])
+        segment_tokens.append(tokens)
+        normalized_segments.append(normalized_text)
+
+    for index, segment in enumerate(transcript_segments[:-1]):
+        text = segment["text"]
+        normalized_text = normalized_segments[index]
+        if "?" not in text:
+            continue
+        if not any(normalized_text.startswith(prefix) for prefix in PODCAST_QUESTION_PREFIXES):
+            continue
+        next_tokens = segment_tokens[index + 1]
+        next_text = transcript_segments[index + 1]["text"]
+        if "?" in next_text:
+            continue
+        if 1 <= len(next_tokens) <= 18:
+            question_turn_count += 1
 
     speaker_counts = Counter(speaker_sequence)
     speaker_switches = sum(1 for left, right in zip(speaker_sequence, speaker_sequence[1:]) if left != right)
@@ -302,6 +450,11 @@ def extract_transcript_features(transcript_segments: list[dict[str, Any]]) -> di
         "gameplay_keyword_ratio": round(gameplay_hits / max(total_words, 1), 4),
         "tutorial_keyword_ratio": round(tutorial_hits / max(total_words, 1), 4),
         "podcast_keyword_ratio": round(podcast_hits / max(total_words, 1), 4),
+        "commentary_keyword_ratio": round(commentary_hits / max(total_words, 1), 4),
+        "instruction_segment_ratio": round(instruction_segment_count / len(transcript_segments), 4),
+        "direct_address_ratio": round(direct_address_segment_count / len(transcript_segments), 4),
+        "commentary_segment_ratio": round(commentary_segment_count / len(transcript_segments), 4),
+        "qa_turn_ratio": round(question_turn_count / len(transcript_segments), 4),
         "speaker_distribution": dict(sorted(speaker_counts.items())),
     }
 
@@ -544,16 +697,18 @@ def classify_from_features(
         )
 
     scores = {
-        "podcast": 0.12,
+        "podcast": 0.1,
         "gameplay": 0.12,
         "tutorial": 0.12,
-        "generic": 0.18,
+        "commentary": 0.1,
+        "generic": 0.16,
     }
     reasons_by_type: dict[str, list[str]] = {key: [] for key in scores}
 
-    def add(content_type: str, amount: float, reason: str) -> None:
+    def adjust(content_type: str, amount: float, reason: str | None = None) -> None:
         scores[content_type] += amount
-        reasons_by_type[content_type].append(reason)
+        if reason and amount > 0:
+            reasons_by_type[content_type].append(reason)
 
     speech_ratio = float(features.get("speech_coverage_ratio", 0.0))
     avg_segment_duration = float(features.get("avg_segment_duration", 0.0))
@@ -564,10 +719,16 @@ def classify_from_features(
     dominant_speaker_ratio = float(features.get("dominant_speaker_ratio", 0.0))
     chaos_ratio = float(features.get("chaos_ratio", 0.0))
     emotion_ratio = float(features.get("emotion_segment_ratio", 0.0))
+    question_ratio = float(features.get("question_ratio", 0.0))
     words_per_second = float(features.get("avg_words_per_second", 0.0))
     gameplay_keyword_ratio = float(features.get("gameplay_keyword_ratio", 0.0))
     tutorial_keyword_ratio = float(features.get("tutorial_keyword_ratio", 0.0))
     podcast_keyword_ratio = float(features.get("podcast_keyword_ratio", 0.0))
+    commentary_keyword_ratio = float(features.get("commentary_keyword_ratio", 0.0))
+    instruction_segment_ratio = float(features.get("instruction_segment_ratio", 0.0))
+    direct_address_ratio = float(features.get("direct_address_ratio", 0.0))
+    commentary_segment_ratio = float(features.get("commentary_segment_ratio", 0.0))
+    qa_turn_ratio = float(features.get("qa_turn_ratio", 0.0))
     motion_score = float(features.get("motion_score", 0.0))
     scene_change_rate = float(features.get("scene_change_rate", 0.0))
     face_presence_ratio = float(features.get("face_presence_ratio", 0.0))
@@ -577,66 +738,135 @@ def classify_from_features(
     heatmap_volatility = float(features.get("heatmap_volatility", 0.0))
     heatmap_high_energy_ratio = float(features.get("heatmap_high_energy_ratio", 0.0))
 
-    if speech_ratio >= 0.7:
-        add("podcast", 0.18, "High speech coverage across the material.")
-        add("tutorial", 0.16, "Speech dominates the material, which fits tutorial-like delivery.")
-    if avg_segment_duration >= 1.8:
-        add("podcast", 0.16, "Utterances are relatively long and conversational.")
-        add("tutorial", 0.12, "Longer complete utterances fit explanatory content.")
-    if long_segment_ratio >= 0.22:
-        add("podcast", 0.1, "The transcript contains many longer turns.")
-    if speaker_count >= 2:
-        add("podcast", 0.14, "Multiple recurring speakers are present.")
-    if 1.0 <= switch_rate <= 9.0:
-        add("podcast", 0.12, "Speaker turns look like a live conversation.")
-    if dominant_speaker_ratio <= 0.78 and speaker_count >= 2:
-        add("podcast", 0.08, "No single speaker dominates the full transcript.")
-    if face_presence_ratio >= 0.45 and face_stability >= 0.45:
-        add("podcast", 0.12, "Faces are present and relatively stable on screen.")
-
-    if gameplay_keyword_ratio >= 0.01:
-        add("gameplay", 0.22, "Transcript contains gameplay-oriented vocabulary.")
-    if motion_score >= 0.55:
-        add("gameplay", 0.22, "Visual motion is high across sampled frames.")
-    if scene_change_rate >= 0.18:
-        add("gameplay", 0.16, "Scene changes are frequent.")
-    if emotion_ratio >= 0.28:
-        add("gameplay", 0.12, "Speech contains many emotionally elevated segments.")
-    if short_segment_ratio >= 0.32:
-        add("gameplay", 0.1, "Many short reactive lines match gameplay comms.")
-    if face_overlay_ratio >= 0.25:
-        add("gameplay", 0.1, "Detected faces look more like a smaller facecam overlay than a full talking head.")
-    if heatmap_volatility >= 0.11 or heatmap_high_energy_ratio >= 0.16:
-        add("gameplay", 0.1, "Energy changes are dynamic enough for gameplay.")
-    if chaos_ratio >= 0.16:
-        add("gameplay", 0.06, "The transcript has some overlap or chaotic exchanges.")
-
-    if tutorial_keyword_ratio >= 0.01:
-        add("tutorial", 0.28, "Transcript contains instructional vocabulary.")
-    if speech_ratio >= 0.72 and speaker_count <= 2:
-        add("tutorial", 0.1, "Speech is dominant and the number of speakers is low.")
+    if speech_ratio >= 0.75:
+        adjust("podcast", 0.1, "Speech coverage is high enough for a talk-led format.")
+        adjust("tutorial", 0.08, "Speech dominates the material, which fits guided instruction.")
+        adjust("commentary", 0.16, "Speech coverage is high enough for narrator-led commentary.")
     if avg_segment_duration >= 1.6:
-        add("tutorial", 0.08, "Utterances are long enough to carry explanations.")
-    if emotion_ratio <= 0.16:
-        add("tutorial", 0.08, "Speech is relatively calm rather than reaction-driven.")
-    if motion_score <= 0.35 and scene_change_rate <= 0.12:
-        add("tutorial", 0.1, "The visual layer is relatively stable.")
-    if words_per_second <= 3.3:
-        add("tutorial", 0.06, "Delivery speed is compatible with instructional pacing.")
+        adjust("podcast", 0.06, "Utterances are long enough to form complete spoken turns.")
+        adjust("tutorial", 0.06, "Utterances are long enough to carry explanations.")
+        adjust("commentary", 0.08, "Utterances are long enough to form explanatory monologue beats.")
+    if long_segment_ratio >= 0.12:
+        adjust("commentary", 0.08, "The transcript contains many longer explanatory turns.")
+    if question_ratio >= 0.04:
+        adjust("podcast", 0.18, "The transcript contains many explicit question turns.")
+    elif question_ratio >= 0.025:
+        adjust("podcast", 0.08, "The transcript includes recurring question turns.")
+    if qa_turn_ratio >= 0.035:
+        adjust("podcast", 0.22, "Questions are frequently followed by short answer-like responses.")
+    if podcast_keyword_ratio >= 0.002:
+        adjust("podcast", 0.16, "Transcript contains explicit conversation or podcast cues.")
+    if direct_address_ratio >= 0.02:
+        adjust("podcast", 0.06, "Speakers address each other or the viewer directly.")
+    if 2.2 <= words_per_second <= 3.2 and avg_segment_duration >= 1.5:
+        adjust("podcast", 0.06, "Delivery pacing matches a spoken conversation.")
+    if face_presence_ratio >= 0.15 and face_stability >= 0.45:
+        adjust("podcast", 0.05, "Faces stay on screen long enough to support conversation framing.")
+    if instruction_segment_ratio >= 0.08:
+        scores["podcast"] -= 0.14
+    if commentary_segment_ratio >= 0.04 and question_ratio <= 0.025:
+        scores["podcast"] -= 0.18
+    if question_ratio <= 0.015:
+        scores["podcast"] -= 0.08
+    if gameplay_keyword_ratio >= 0.003 and short_segment_ratio >= 0.35:
+        scores["podcast"] -= 0.08
+
+    if tutorial_keyword_ratio >= 0.005:
+        adjust("tutorial", 0.22, "Transcript contains clear instructional vocabulary.")
+    if instruction_segment_ratio >= 0.12:
+        adjust("tutorial", 0.24, "Instruction-like segments appear throughout the material.")
+    elif instruction_segment_ratio >= 0.06:
+        adjust("tutorial", 0.14, "The transcript repeatedly uses step-by-step instruction patterns.")
+    if direct_address_ratio >= 0.03:
+        adjust("tutorial", 0.12, "The speaker frequently addresses the viewer directly.")
+    elif direct_address_ratio >= 0.015:
+        adjust("tutorial", 0.06, "Viewer-directed phrasing appears repeatedly.")
+    if words_per_second <= 3.1:
+        adjust("tutorial", 0.06, "Delivery speed is compatible with instructional pacing.")
+    if question_ratio <= 0.015:
+        adjust("tutorial", 0.05, "The transcript focuses on explanation rather than dialogue.")
+    if face_presence_ratio <= 0.18:
+        adjust("tutorial", 0.06, "The video looks more screen-led than face-led.")
     if face_large_ratio <= 0.35:
-        add("tutorial", 0.04, "The video does not look dominated by a large talking head.")
+        adjust("tutorial", 0.04, "The frame is not dominated by a large talking head.")
+    if qa_turn_ratio >= 0.03:
+        scores["tutorial"] -= 0.1
+    if commentary_segment_ratio >= 0.04:
+        scores["tutorial"] -= 0.1
+    if gameplay_keyword_ratio >= 0.003:
+        scores["tutorial"] -= 0.06
+
+    if gameplay_keyword_ratio >= 0.003:
+        adjust("gameplay", 0.24, "Transcript contains gameplay-oriented vocabulary.")
+    elif gameplay_keyword_ratio >= 0.0015 and short_segment_ratio >= 0.35:
+        adjust("gameplay", 0.12, "Reactive short lines still resemble gameplay comms.")
+    if motion_score >= 0.75 and scene_change_rate >= 0.28:
+        adjust("gameplay", 0.12, "Visual motion and scene changes are highly dynamic.")
+    elif motion_score >= 0.55 and scene_change_rate >= 0.18:
+        adjust("gameplay", 0.06, "The visual layer is dynamic enough to support gameplay.")
+    if emotion_ratio >= 0.24:
+        adjust("gameplay", 0.12, "Speech contains many emotionally elevated segments.")
+    if short_segment_ratio >= 0.45:
+        adjust("gameplay", 0.12, "Many short reactive lines match gameplay comms.")
+    elif short_segment_ratio >= 0.3:
+        adjust("gameplay", 0.06, "Short reactive lines appear often enough for gameplay.")
+    if chaos_ratio >= 0.12:
+        adjust("gameplay", 0.08, "The transcript has some overlap or chaotic exchanges.")
+    if face_overlay_ratio >= 0.25 and speech_ratio <= 0.75:
+        adjust("gameplay", 0.06, "Detected faces look more like a smaller facecam overlay.")
+    if heatmap_volatility >= 0.11 or heatmap_high_energy_ratio >= 0.16:
+        adjust("gameplay", 0.08, "Energy changes are dynamic enough for gameplay.")
+    if speech_ratio >= 0.82 and gameplay_keyword_ratio < 0.002 and short_segment_ratio < 0.28:
+        scores["gameplay"] -= 0.18
+    if instruction_segment_ratio >= 0.08:
+        scores["gameplay"] -= 0.12
+    if question_ratio >= 0.04 and qa_turn_ratio >= 0.035:
+        scores["gameplay"] -= 0.1
+
+    if commentary_segment_ratio >= 0.04 or commentary_keyword_ratio >= 0.0025:
+        adjust("commentary", 0.2, "Transcript contains repeated public-affairs or commentary cues.")
+    elif commentary_segment_ratio >= 0.012 or commentary_keyword_ratio >= 0.0012:
+        adjust("commentary", 0.1, "Some transcript segments resemble commentary-style analysis.")
+    if question_ratio <= 0.025:
+        adjust("commentary", 0.12, "There are few explicit question turns, which fits monologue delivery.")
+    if qa_turn_ratio <= 0.02:
+        adjust("commentary", 0.1, "Question-to-answer turn-taking is limited.")
+    if instruction_segment_ratio <= 0.04 and tutorial_keyword_ratio <= 0.004:
+        adjust("commentary", 0.06, "Instructional language is scarce.")
+    if direct_address_ratio <= 0.015:
+        adjust("commentary", 0.06, "Direct address to a viewer or co-host is limited.")
+    if question_ratio >= 0.04 and qa_turn_ratio >= 0.03:
+        scores["commentary"] -= 0.14
+    if instruction_segment_ratio >= 0.08:
+        scores["commentary"] -= 0.16
+    if gameplay_keyword_ratio >= 0.003:
+        scores["commentary"] -= 0.12
+
+    scores["podcast"] = clamp(scores["podcast"], 0.0, 1.2)
+    scores["gameplay"] = clamp(scores["gameplay"], 0.0, 1.2)
+    scores["tutorial"] = clamp(scores["tutorial"], 0.0, 1.2)
+    scores["commentary"] = clamp(scores["commentary"], 0.0, 1.2)
 
     if speaker_count == 0 or speech_ratio < 0.35:
-        add("generic", 0.2, "Speech structure is too weak for a more specific class.")
-    if max(abs(scores["gameplay"] - scores["podcast"]), abs(scores["gameplay"] - scores["tutorial"]), abs(scores["podcast"] - scores["tutorial"])) < 0.12:
-        add("generic", 0.14, "The content signals are fairly ambiguous.")
-    if all(
-        scores[content_type] < 0.52
-        for content_type in ("podcast", "gameplay", "tutorial")
+        adjust("generic", 0.2, "Speech structure is too weak for a more specific class.")
+    specialized_scores = [
+        scores["podcast"],
+        scores["gameplay"],
+        scores["tutorial"],
+        scores["commentary"],
+    ]
+    sorted_specialized_scores = sorted(specialized_scores, reverse=True)
+    if sorted_specialized_scores[0] - sorted_specialized_scores[1] < 0.08:
+        adjust("generic", 0.14, "The content signals are fairly ambiguous.")
+    if all(score < 0.56 for score in specialized_scores):
+        adjust("generic", 0.18, "No specialized class is confident enough yet.")
+    if (
+        gameplay_keyword_ratio < 0.002
+        and tutorial_keyword_ratio < 0.004
+        and podcast_keyword_ratio < 0.002
+        and commentary_keyword_ratio < 0.0015
     ):
-        add("generic", 0.18, "No specialized class is confident enough yet.")
-    if gameplay_keyword_ratio < 0.004 and tutorial_keyword_ratio < 0.004 and podcast_keyword_ratio < 0.002:
-        add("generic", 0.08, "Keyword evidence is weak, so a generic fallback stays safer.")
+        adjust("generic", 0.08, "Keyword evidence is weak, so a generic fallback stays safer.")
 
     ranked = sorted(
         ((content_type, score) for content_type, score in scores.items() if content_type != "generic"),
@@ -717,7 +947,7 @@ def parse_args() -> argparse.Namespace:
         "--content-type",
         default="auto",
         choices=VALID_CONTENT_TYPE_MODES,
-        help="auto, podcast, gameplay, tutorial or generic",
+        help="auto, podcast, gameplay, tutorial, commentary or generic",
     )
     parser.add_argument("--output", default=None, help="Optional JSON output path")
     return parser.parse_args()

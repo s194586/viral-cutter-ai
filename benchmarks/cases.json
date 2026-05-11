@@ -21,9 +21,9 @@
     {
       "id": "ukraine_war_report",
       "label": "Ukraine war report commentary",
-      "expected_content_type": "generic",
+      "expected_content_type": "commentary",
       "source_url": "https://www.youtube.com/watch?v=5hC0yPPFOYA",
-      "description": "Single-host war report with map-based commentary and headline-driven analysis. Treated as generic/commentary-like for the current classifier taxonomy.",
+      "description": "Single-host war report with map-based commentary and headline-driven analysis. Previously tracked as generic/commentary-like before the dedicated commentary class was introduced.",
       "expected_speaker_mode": "single_speaker",
       "video": "benchmarks/assets/ukraine_war_report/input/source.mp4",
       "audio": "benchmarks/assets/ukraine_war_report/input/source.mp3",
@@ -34,14 +34,14 @@
         "podcast"
       ],
       "include_generic_baseline": true,
-      "notes": "Added as a generic/commentary benchmark. It is speech-heavy, but it is not a true podcast or tutorial."
+      "notes": "Added as a commentary benchmark. It is speech-heavy, but it is not a true podcast or tutorial."
     },
     {
       "id": "roman_giertych_commentary",
       "label": "Roman Giertych commentary essay",
-      "expected_content_type": "generic",
+      "expected_content_type": "commentary",
       "source_url": "https://www.youtube.com/watch?v=FheyKl2x73A",
-      "description": "Single-narrator political commentary / explainer essay with archival visuals. Treated as generic/commentary-like for the current taxonomy.",
+      "description": "Single-narrator political commentary / explainer essay with archival visuals. Previously tracked as generic/commentary-like before the dedicated commentary class was introduced.",
       "expected_speaker_mode": "single_speaker",
       "video": "benchmarks/assets/roman_giertych_commentary/input/source.mp4",
       "audio": "benchmarks/assets/roman_giertych_commentary/input/source.mp3",
@@ -52,14 +52,14 @@
         "podcast"
       ],
       "include_generic_baseline": true,
-      "notes": "Added as a generic/commentary benchmark. It resembles a narrated commentary video more than a dialogue-driven podcast."
+      "notes": "Added as a commentary benchmark. It resembles a narrated commentary video more than a dialogue-driven podcast."
     },
     {
       "id": "putin_parade_commentary",
       "label": "Putin parade commentary",
-      "expected_content_type": "generic",
+      "expected_content_type": "commentary",
       "source_url": "https://www.youtube.com/watch?v=7t9yv4d318U",
-      "description": "Single-host current-events commentary about Russia's parade and Ukraine. Treated as generic/commentary-like for the current taxonomy.",
+      "description": "Single-host current-events commentary about Russia's parade and Ukraine. Previously tracked as generic/commentary-like before the dedicated commentary class was introduced.",
       "expected_speaker_mode": "single_speaker",
       "video": "benchmarks/assets/putin_parade_commentary/input/source.mp4",
       "audio": "benchmarks/assets/putin_parade_commentary/input/source.mp3",
@@ -70,7 +70,7 @@
         "podcast"
       ],
       "include_generic_baseline": true,
-      "notes": "Added as a generic/commentary benchmark. Useful for testing news-like monologue material without introducing a new taxonomy class yet."
+      "notes": "Added as a commentary benchmark. Useful for testing news-like monologue material against the dedicated commentary route."
     },
     {
       "id": "magenta_team_podcast",

@@ -29,7 +29,7 @@ from pipeline_modes import (
 )
 
 
-VALID_CONTENT_TYPES = ("podcast", "gameplay", "tutorial", "generic")
+VALID_CONTENT_TYPES = ("podcast", "gameplay", "tutorial", "commentary", "generic")
 VALID_CONTENT_TYPE_MODES = ("auto",) + VALID_CONTENT_TYPES
 PROJECT_ROOT = Path(__file__).resolve().parent
 BENCHMARK_ROOT = PROJECT_ROOT / "benchmarks"
@@ -962,6 +962,8 @@ def run_selection_scenario(
             "detected_content_type": content_routing.get("content_type"),
             "confidence": content_routing.get("confidence"),
             "reasons": content_routing.get("reasons") or [],
+            "scores": content_routing.get("scores") or {},
+            "features": content_routing.get("features") or {},
             "source": content_routing.get("source"),
             "classifier_source": content_routing.get("classifier_source"),
             "forced_content_type": content_routing.get("forced_content_type"),
@@ -1198,18 +1200,26 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
     lines.append("")
 
     completed_cases = [case for case in report_payload["cases"] if case.get("status") == "completed"]
+    commentary_cases = [case for case in completed_cases if case.get("expected_content_type") == "commentary"]
     generic_cases = [case for case in completed_cases if case.get("expected_content_type") == "generic"]
     podcast_cases = [case for case in completed_cases if case.get("expected_content_type") == "podcast"]
     tutorial_cases = [case for case in completed_cases if case.get("expected_content_type") == "tutorial"]
     commentary_as_podcast = 0
+    commentary_correct = 0
     podcast_correct = 0
     tutorial_correct = 0
     single_speaker_oversegmented = 0
-    for case in generic_cases:
+    commentary_like_cases = commentary_cases or generic_cases
+    for case in commentary_like_cases:
         auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
         if auto and auto.get("status") == "completed":
             if auto.get("classification", {}).get("detected_content_type") == "podcast":
                 commentary_as_podcast += 1
+    for case in commentary_cases:
+        auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
+        if auto and auto.get("status") == "completed":
+            if auto.get("classification", {}).get("detected_content_type") == "commentary":
+                commentary_correct += 1
     for case in podcast_cases:
         auto = next((scenario for scenario in case.get("scenarios", []) if scenario.get("scenario_id") == "auto"), None)
         if auto and auto.get("status") == "completed":
@@ -1228,9 +1238,13 @@ def build_markdown_report(report_payload: dict[str, Any]) -> str:
 
     lines.append("## Key Observations")
     lines.append("")
-    if generic_cases:
+    if commentary_like_cases:
         lines.append(
-            f"- Commentary / generic cases routed to `podcast` in `{commentary_as_podcast}/{len(generic_cases)}` cases."
+            f"- Commentary-like cases routed to `podcast` in `{commentary_as_podcast}/{len(commentary_like_cases)}` cases."
+        )
+    if commentary_cases:
+        lines.append(
+            f"- True commentary cases classified correctly as `commentary`: `{commentary_correct}/{len(commentary_cases)}`."
         )
     if podcast_cases:
         lines.append(
