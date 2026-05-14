@@ -768,6 +768,12 @@
   - `emeritos_gameplay/auto` clip `2` (05:37.91 - 06:14.94) | expected `gameplay` | local `94.29`
   - `emeritos_gameplay/auto` clip `4` (04:14.05 - 04:59.95) | expected `gameplay` | local `92.7`
 
+## Review Dashboard
+
+- Generate a local review dashboard with `python review_dashboard.py export-html`.
+- Append review feedback with `python review_dashboard.py add-review --clip-id CLIP_ID --rating 4 --good-clip true --notes "..."`.
+- Reviews are stored append-only in `benchmarks/human_reviews.jsonl`.
+
 ## Recommendation
 
 - Next step: `more_human_review`
