@@ -1,16 +1,57 @@
-# Ciężkie pliki wideo i audio
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local pipeline artifacts
 input/
 cuts/
 ready_to_post/
-*.mp4
-*.mp3
-
-# Dane i metadane (często bardzo duże)
+cache/
 metadata/
 transcripts/
-cache/
-__pycache__/
-*.json
+models/
+tmp/
+.tools/
 
-# Tajne klucze (API KEY!) - NIGDY nie wysyłaj tego na GitHub
-.env
+# Media outputs
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.webm
+*.mov
+*.mkv
+*.avi
+*.ass
+
+# Benchmark generated outputs
+benchmarks/runs/
+benchmarks/human_review_archive.csv
+benchmarks/human_review_recovered_*.csv
+
+# JSON defaults: ignore generated JSON, then allow committed config/report files
+*.json
+!config.json
+!benchmarks/cases.json
+!benchmarks/results.json
+
+# Logs
+*.log

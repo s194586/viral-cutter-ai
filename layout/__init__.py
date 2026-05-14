@@ -1,0 +1,67 @@
+from __future__ import annotations
+
+from .base import VALID_LAYOUT_MODES, LayoutProfile, is_vertical_9_16, normalize_layout_mode
+from .commentary import build_commentary_layout
+from .gameplay import build_gameplay_layout
+from .generic import build_generic_layout
+from .podcast import build_podcast_layout
+from .tutorial import build_tutorial_layout
+
+
+LAYOUT_BUILDERS = {
+    "commentary": build_commentary_layout,
+    "gameplay": build_gameplay_layout,
+    "generic": build_generic_layout,
+    "podcast": build_podcast_layout,
+    "tutorial": build_tutorial_layout,
+}
+
+
+OVERRIDE_LAYOUT_BUILDERS = {
+    "full_frame_blur_background": build_tutorial_layout,
+    "gameplay_priority_crop": build_gameplay_layout,
+    "safe_center_crop": build_generic_layout,
+    "speaker_face_crop": build_podcast_layout,
+    "stable_subject_crop": build_commentary_layout,
+    "vertical_crop": build_generic_layout,
+}
+
+
+def get_layout_profile(content_type: str | None, layout_mode: str | None = "auto") -> LayoutProfile:
+    normalized_type = str(content_type or "generic").strip().lower() or "generic"
+    normalized_mode = normalize_layout_mode(layout_mode)
+
+    if normalized_mode != "auto":
+        builder = OVERRIDE_LAYOUT_BUILDERS.get(normalized_mode, build_generic_layout)
+        profile = builder()
+        if normalized_mode == "vertical_crop":
+            return LayoutProfile(
+                content_type=normalized_type,
+                layout_mode="vertical_crop",
+                crop_priority="center",
+                allow_face_tracking=profile.allow_face_tracking,
+                face_tracking_weight=profile.face_tracking_weight,
+                preserve_full_frame=False,
+                blur_background=False,
+                safe_center_crop=True,
+                output_width=profile.output_width,
+                output_height=profile.output_height,
+                output_aspect_ratio=profile.output_aspect_ratio,
+                max_crop_motion=profile.max_crop_motion,
+                smoothing_strength=profile.smoothing_strength,
+                min_face_area_for_tracking=profile.min_face_area_for_tracking,
+                ignore_edge_faces=profile.ignore_edge_faces,
+            )
+        return LayoutProfile(content_type=normalized_type, **{k: v for k, v in profile.to_dict().items() if k != "content_type"})
+
+    builder = LAYOUT_BUILDERS.get(normalized_type, build_generic_layout)
+    return builder()
+
+
+__all__ = [
+    "LayoutProfile",
+    "VALID_LAYOUT_MODES",
+    "get_layout_profile",
+    "is_vertical_9_16",
+    "normalize_layout_mode",
+]

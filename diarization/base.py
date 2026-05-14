@@ -1,0 +1,52 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+
+@dataclass
+class DiarizationConfig:
+    backend: str = "heuristic_cluster"
+    enabled: bool = True
+    sample_rate: int = 16000
+    max_speakers: int = 4
+    min_segment_seconds: float = 0.35
+    similarity_threshold: float = 0.985
+    merge_similarity_threshold: float = 0.95
+    single_speaker_similarity_floor: float = 0.955
+    min_cluster_share: float = 0.08
+    min_cluster_seconds: float = 18.0
+    min_cluster_segments: int = 6
+    multi_speaker_min_share: float = 0.18
+    single_speaker_likelihood_threshold: float = 0.58
+
+
+@dataclass
+class DiarizationResult:
+    backend: str
+    enabled: bool
+    status: str
+    speaker_count: int
+    diarization_seconds: float
+    used_fallback: bool
+    extra_metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = {
+            "backend": self.backend,
+            "enabled": self.enabled,
+            "status": self.status,
+            "speaker_count": self.speaker_count,
+            "diarization_seconds": round(self.diarization_seconds, 3),
+            "used_fallback": self.used_fallback,
+        }
+        payload.update(self.extra_metadata)
+        return payload
+
+
+class DiarizationBackend:
+    name = "base"
+
+    def assign_speakers(self, audio_path: Path, segments: list[Any]) -> DiarizationResult:
+        raise NotImplementedError
