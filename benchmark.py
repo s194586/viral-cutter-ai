@@ -514,10 +514,16 @@ def dedupe_preserve_order(items: list[str]) -> list[str]:
     return ordered
 
 
-def build_case_scenarios(case: BenchmarkCase) -> list[dict[str, str]]:
-    scenario_types = ["auto", case.expected_content_type, *case.comparison_content_types]
-    if case.include_generic_baseline:
-        scenario_types.append("generic")
+def build_case_scenarios(
+    case: BenchmarkCase,
+    *,
+    include_compare_strategies: bool = False,
+) -> list[dict[str, str]]:
+    scenario_types = ["auto"]
+    if include_compare_strategies:
+        scenario_types.extend([case.expected_content_type, *case.comparison_content_types])
+        if case.include_generic_baseline:
+            scenario_types.append("generic")
     scenarios = []
     for content_type in dedupe_preserve_order(scenario_types):
         scenarios.append(
@@ -933,6 +939,7 @@ def summarize_rendering_metrics(
     crop_priorities = Counter()
     layout_modes = Counter()
     layout_policies = Counter()
+    layout_modes_used = Counter()
     tracking_modes = Counter()
     face_tracking_used_count = 0
     center_x_means = []
@@ -956,6 +963,8 @@ def summarize_rendering_metrics(
             layout_modes[str(adjustment.get("layout_mode") or face_tracking.get("layout_mode"))] += 1
         if adjustment.get("layout_policy") or face_tracking.get("layout_policy"):
             layout_policies[str(adjustment.get("layout_policy") or face_tracking.get("layout_policy"))] += 1
+        if face_tracking.get("layout_mode_used"):
+            layout_modes_used[str(face_tracking.get("layout_mode_used"))] += 1
         if face_tracking.get("crop_mode"):
             crop_modes[str(face_tracking.get("crop_mode"))] += 1
         if face_tracking.get("crop_priority"):
@@ -1000,6 +1009,7 @@ def summarize_rendering_metrics(
         "ignored_faces_count": ignored_faces_count,
         "layout_modes": dict(layout_modes),
         "layout_policies": dict(layout_policies),
+        "layout_modes_used": dict(layout_modes_used),
         "crop_modes": dict(crop_modes),
         "crop_priorities": dict(crop_priorities),
         "tracking_modes": dict(tracking_modes),
@@ -2517,7 +2527,7 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         )
 
         scenarios = []
-        for scenario in build_case_scenarios(case):
+        for scenario in build_case_scenarios(case, include_compare_strategies=bool(args.include_compare_strategies)):
             print(f"[benchmark]   Scenario: {scenario['id']}")
             scenario_result = run_selection_scenario(
                 case,
@@ -2629,6 +2639,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", default="benchmarks", help="Benchmark output directory")
     parser.add_argument("--case", action="append", default=[], help="Run only selected case id(s)")
     parser.add_argument("--top", type=int, default=5, help="How many clips to select per scenario")
+    parser.add_argument(
+        "--include-compare-strategies",
+        action="store_true",
+        help="Include manual/compare benchmark scenarios for diagnostics; default review output stays auto-only.",
+    )
     parser.add_argument(
         "--ai-mode",
         default=AI_MODE_LOCAL_ONLY,

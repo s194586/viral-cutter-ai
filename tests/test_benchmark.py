@@ -9,6 +9,7 @@ from unittest.mock import patch
 from benchmark import (
     BenchmarkCase,
     annotate_case_duplicates,
+    build_case_scenarios,
     build_next_human_review_targets,
     count_overlapping_windows,
     extract_human_review_rows_from_results,
@@ -110,6 +111,49 @@ class BenchmarkHelpersTests(unittest.TestCase):
         self.assertEqual(summary["score_distribution"]["max"], 91.2)
         self.assertEqual(summary["selection_reason_counts"]["strong heatmap support"], 2)
         self.assertGreater(summary["temporal_metrics"]["temporal_coverage_ratio"], 0.0)
+
+    def test_build_case_scenarios_defaults_to_auto_only(self):
+        case = BenchmarkCase(
+            case_id="case_a",
+            label="Case A",
+            expected_content_type="gameplay",
+            source_url="",
+            description="",
+            video=Path("clip.mp4"),
+            audio=None,
+            heatmap=None,
+            info_json=None,
+            transcript_source=None,
+            expected_speaker_mode="single",
+            comparison_content_types=["podcast"],
+            include_generic_baseline=True,
+            notes="",
+        )
+        scenarios = build_case_scenarios(case)
+        self.assertEqual([item["id"] for item in scenarios], ["auto"])
+
+    def test_build_case_scenarios_can_include_compare_variants(self):
+        case = BenchmarkCase(
+            case_id="case_a",
+            label="Case A",
+            expected_content_type="gameplay",
+            source_url="",
+            description="",
+            video=Path("clip.mp4"),
+            audio=None,
+            heatmap=None,
+            info_json=None,
+            transcript_source=None,
+            expected_speaker_mode="single",
+            comparison_content_types=["podcast"],
+            include_generic_baseline=True,
+            notes="",
+        )
+        scenarios = build_case_scenarios(case, include_compare_strategies=True)
+        self.assertEqual(
+            [item["id"] for item in scenarios],
+            ["auto", "manual_gameplay", "compare_podcast", "compare_generic"],
+        )
 
     def test_summarize_transcript_metrics_keeps_diarization_diagnostics(self):
         segments = [
@@ -574,6 +618,7 @@ class BenchmarkHelpersTests(unittest.TestCase):
                         "framing_mode": "full_frame_blur_background",
                         "layout_mode": "full_frame_blur_background",
                         "face_tracking": {
+                            "layout_mode_used": "full_frame_blur_background",
                             "crop_mode": "content_preserving",
                             "crop_priority": "screen",
                             "tracking_mode": "full_frame_blur_background",
@@ -583,6 +628,9 @@ class BenchmarkHelpersTests(unittest.TestCase):
                             "zoom_samples": 0,
                             "ignored_faces_count": 0,
                             "face_tracking_used": False,
+                            "full_frame_preserved": True,
+                            "crop_stabilized": True,
+                            "fallback_reason": "",
                             "center_x_mean_norm": 0.5,
                             "center_y_mean_norm": 0.5,
                         },
@@ -595,6 +643,7 @@ class BenchmarkHelpersTests(unittest.TestCase):
             ):
                 summary = summarize_rendering_metrics(cutting_log, raw_dir, subtitle_dir, expected_clips=1)
             self.assertEqual(summary["layout_modes"]["full_frame_blur_background"], 1)
+            self.assertEqual(summary["layout_modes_used"]["full_frame_blur_background"], 1)
             self.assertEqual(summary["output_aspect_ratio"], "9:16")
             self.assertTrue(summary["is_vertical_9_16"])
             self.assertEqual(summary["output_width"], "1080")

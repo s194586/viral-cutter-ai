@@ -571,9 +571,10 @@ def resolve_render_plan(cutting_log, requested_layout_mode="auto"):
     return render_hints
 
 
-def build_static_render_stats(video_path, start, duration, *, render_hints, tracking_mode, output_path=None):
+def build_static_render_stats(video_path, start, duration, *, render_hints, tracking_mode, output_path=None, fallback_reason=""):
     fps, frame_width, frame_height = inspect_video_stream(video_path)
     total_frames = max(1, int(round(duration * fps)))
+    full_frame_preserved = bool(render_hints.get("preserve_full_frame")) and tracking_mode == "full_frame_blur_background"
     stats = {
         "fps": fps,
         "frame_width": frame_width,
@@ -588,14 +589,18 @@ def build_static_render_stats(video_path, start, duration, *, render_hints, trac
         "smoothing_window": SMOOTHING_WINDOW,
         "layout_mode": render_hints.get("layout_mode"),
         "layout_policy": render_hints.get("layout_policy"),
+        "layout_mode_used": tracking_mode if tracking_mode in {"full_frame_blur_background", "safe_center_crop", "center_fallback"} else render_hints.get("layout_mode"),
         "crop_mode": render_hints.get("crop_mode"),
         "crop_priority": render_hints.get("crop_priority"),
         "face_tracking_allowed": bool(render_hints.get("allow_face_tracking")),
         "face_tracking_used": False,
         "preserve_full_frame": bool(render_hints.get("preserve_full_frame")),
+        "full_frame_preserved": full_frame_preserved,
         "blur_background": bool(render_hints.get("blur_background")),
         "safe_center_crop": bool(render_hints.get("safe_center_crop")),
         "tracking_mode": tracking_mode,
+        "crop_stabilized": True,
+        "fallback_reason": str(fallback_reason or ""),
         "center_x_mean_norm": 0.5,
         "center_y_mean_norm": 0.5,
         "center_x_std_norm": 0.0,
@@ -950,6 +955,13 @@ def render_dynamic_segment(video_path, frames_dir, start, duration, clip_segment
         analyzer.close()
         del capture
 
+    face_tracking_used = detected_frames > 0
+    fallback_reason = ""
+    layout_mode_used = str(render_hints.get("layout_mode") or "")
+    if not face_tracking_used:
+        fallback_reason = "no_faces_detected_center_crop"
+        layout_mode_used = "safe_center_crop"
+
     return {
         "fps": fps,
         "frame_width": frame_width,
@@ -964,14 +976,18 @@ def render_dynamic_segment(video_path, frames_dir, start, duration, clip_segment
         "smoothing_window": SMOOTHING_WINDOW,
         "layout_mode": render_hints.get("layout_mode"),
         "layout_policy": render_hints.get("layout_policy"),
+        "layout_mode_used": layout_mode_used,
         "crop_mode": render_hints.get("crop_mode"),
         "crop_priority": render_hints.get("crop_priority"),
         "face_tracking_allowed": bool(render_hints.get("allow_face_tracking")),
-        "face_tracking_used": True,
+        "face_tracking_used": face_tracking_used,
         "preserve_full_frame": bool(render_hints.get("preserve_full_frame")),
+        "full_frame_preserved": False,
         "blur_background": bool(render_hints.get("blur_background")),
         "safe_center_crop": bool(render_hints.get("safe_center_crop")),
-        "tracking_mode": "dynamic_face_tracking",
+        "tracking_mode": "dynamic_face_tracking" if face_tracking_used else "center_fallback_no_faces",
+        "crop_stabilized": bool(SMOOTHING_WINDOW > 1 and float(render_hints.get("smoothing_strength") or 0.0) > 0.0),
+        "fallback_reason": fallback_reason,
         "center_x_mean_norm": round(sum(center_x_samples) / len(center_x_samples), 4) if center_x_samples else 0.5,
         "center_y_mean_norm": round(sum(center_y_samples) / len(center_y_samples), 4) if center_y_samples else 0.5,
         "center_x_std_norm": round(_std_dev(center_x_samples), 4),
@@ -1078,6 +1094,7 @@ def main():
                 render_hints=render_hints,
                 tracking_mode="center_fallback",
                 output_path=output_path if output_path.exists() else None,
+                fallback_reason=str(exc),
             )
             render_stats["error"] = str(exc)
             print(f"  Warning: face tracking failed for segment {idx}, falling back to center crop. Reason: {exc}")
@@ -1109,6 +1126,7 @@ def main():
                 "decisions": decisions,
                 "framing_mode": framing_mode,
                 "layout_mode": render_hints.get("layout_mode"),
+                "layout_policy": render_hints.get("layout_policy"),
                 "render_hints": render_hints,
                 "face_tracking": render_stats,
                 "boundary_metadata": window.get("boundary_metadata") or {
