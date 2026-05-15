@@ -8,6 +8,7 @@ class LayoutProfileTests(unittest.TestCase):
     def test_tutorial_uses_full_frame_blur_background(self):
         profile = get_layout_profile("tutorial")
         self.assertEqual(profile.layout_mode, "full_frame_blur_background")
+        self.assertEqual(profile.layout_policy, "screen_preserve_blur_bg")
         self.assertTrue(profile.preserve_full_frame)
         self.assertTrue(profile.blur_background)
         self.assertFalse(profile.allow_face_tracking)
@@ -17,6 +18,7 @@ class LayoutProfileTests(unittest.TestCase):
     def test_gameplay_uses_gameplay_priority_crop(self):
         profile = get_layout_profile("gameplay")
         self.assertEqual(profile.layout_mode, "gameplay_priority_crop")
+        self.assertEqual(profile.layout_policy, "gameplay_safe_vertical")
         self.assertEqual(profile.crop_priority, "gameplay")
         self.assertTrue(profile.allow_face_tracking)
         self.assertTrue(profile.ignore_edge_faces)
@@ -25,6 +27,7 @@ class LayoutProfileTests(unittest.TestCase):
     def test_podcast_uses_speaker_face_crop(self):
         profile = get_layout_profile("podcast")
         self.assertEqual(profile.layout_mode, "speaker_face_crop")
+        self.assertEqual(profile.layout_policy, "face_active_speaker")
         self.assertEqual(profile.crop_priority, "speaker_face")
         self.assertTrue(profile.allow_face_tracking)
         self.assertGreater(profile.face_tracking_weight, 0.9)
@@ -32,6 +35,7 @@ class LayoutProfileTests(unittest.TestCase):
     def test_commentary_uses_stable_subject_crop(self):
         profile = get_layout_profile("commentary")
         self.assertEqual(profile.layout_mode, "stable_subject_crop")
+        self.assertEqual(profile.layout_policy, "stable_subject_or_center")
         self.assertEqual(profile.crop_priority, "subject")
         self.assertTrue(profile.allow_face_tracking)
         self.assertTrue(profile.safe_center_crop)
@@ -39,6 +43,7 @@ class LayoutProfileTests(unittest.TestCase):
     def test_generic_uses_safe_center_crop(self):
         profile = get_layout_profile("generic")
         self.assertEqual(profile.layout_mode, "safe_center_crop")
+        self.assertEqual(profile.layout_policy, "safe_center_crop")
         self.assertFalse(profile.allow_face_tracking)
         self.assertTrue(profile.safe_center_crop)
 

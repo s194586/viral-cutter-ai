@@ -189,6 +189,20 @@ def summarize_reviews_by_clip(reviews: list[dict[str, Any]]) -> dict[str, dict[s
     return grouped
 
 
+def summarize_review_flags(reviews: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {
+        "boundary_issue": 0,
+        "boring_setup": 0,
+        "no_payoff": 0,
+        "too_context_dependent": 0,
+    }
+    for review in reviews:
+        for key in summary:
+            if bool(review.get(key)):
+                summary[key] += 1
+    return summary
+
+
 def template_review_payload(row: dict[str, str] | None) -> dict[str, Any] | None:
     if not row:
         return None
@@ -261,6 +275,8 @@ def collect_clips(
             )
             for clip in (scenario.get("selection") or {}).get("clips", []) or []:
                 if not isinstance(clip, dict):
+                    continue
+                if bool(clip.get("deduped")):
                     continue
                 start_label = str(clip.get("start_label") or format_time_value(clip.get("start")))
                 end_label = str(clip.get("end_label") or format_time_value(clip.get("end")))
@@ -720,6 +736,64 @@ def add_review(args: argparse.Namespace) -> None:
     print(f"review_saved clip_id={payload['clip_id']} path={args.reviews}")
 
 
+def summarize_review_file(
+    *,
+    results_path: Path,
+    template_path: Path,
+    reviews_path: Path,
+) -> dict[str, Any]:
+    reviews = load_jsonl_reviews(reviews_path)
+    clips = collect_clips(results_path, template_path, reviews_path)
+    clip_lookup = {clip.clip_id: clip for clip in clips}
+    by_case: dict[str, dict[str, Any]] = {}
+    by_scenario: dict[str, dict[str, Any]] = {}
+    unrouted = 0
+
+    for review in reviews:
+        clip = clip_lookup.get(str(review.get("clip_id") or "").strip())
+        if clip is None:
+            unrouted += 1
+            continue
+        for bucket, key in (
+            (by_case, clip.case_id),
+            (by_scenario, clip.scenario_id),
+        ):
+            entry = bucket.setdefault(key, {"count": 0, "rating_total": 0.0})
+            entry["count"] += 1
+            entry["rating_total"] += float(review.get("rating") or 0.0)
+
+    def finalize(bucket: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        payload: dict[str, dict[str, Any]] = {}
+        for key, value in sorted(bucket.items()):
+            count = int(value.get("count") or 0)
+            rating_total = float(value.get("rating_total") or 0.0)
+            payload[key] = {
+                "count": count,
+                "average_rating": round(rating_total / count, 4) if count else 0.0,
+            }
+        return payload
+
+    ratings = [float(review.get("rating") or 0.0) for review in reviews if review.get("rating") is not None]
+    return {
+        "review_count": len(reviews),
+        "average_rating": round(sum(ratings) / len(ratings), 4) if ratings else 0.0,
+        "flag_counts": summarize_review_flags(reviews),
+        "by_case": finalize(by_case),
+        "by_scenario": finalize(by_scenario),
+        "clips_in_results": len(clips),
+        "unmatched_review_count": unrouted,
+    }
+
+
+def print_review_summary(args: argparse.Namespace) -> None:
+    summary = summarize_review_file(
+        results_path=Path(args.results),
+        template_path=Path(args.template),
+        reviews_path=Path(args.reviews),
+    )
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Local human-review dashboard for AI Virtual Cutter clips.")
     subparsers = parser.add_subparsers(dest="command")
@@ -749,6 +823,12 @@ def build_parser() -> argparse.ArgumentParser:
     review_parser.add_argument("--too-context-dependent", type=parse_bool, default=False)
     review_parser.add_argument("--notes", default="")
     review_parser.set_defaults(func=add_review)
+
+    summary_parser = subparsers.add_parser("summary", help="Summarize JSONL human reviews.")
+    summary_parser.add_argument("--results", default=str(DEFAULT_RESULTS_PATH))
+    summary_parser.add_argument("--template", default=str(DEFAULT_TEMPLATE_PATH))
+    summary_parser.add_argument("--reviews", default=str(DEFAULT_REVIEWS_PATH))
+    summary_parser.set_defaults(func=print_review_summary)
     return parser
 
 

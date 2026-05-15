@@ -61,6 +61,9 @@ class BoundaryRefinementTests(unittest.TestCase):
         self.assertTrue(metadata["sentence_boundary_used"])
         self.assertTrue(metadata["speaker_turn_boundary_used"])
         self.assertFalse(metadata["max_duration_clamped"])
+        self.assertTrue(metadata["boundary_refined"])
+        self.assertGreaterEqual(metadata["preroll_added"], 0.0)
+        self.assertGreaterEqual(metadata["postroll_added"], 0.0)
 
     def test_gameplay_trim_keeps_short_preroll_before_payoff(self):
         context = [
@@ -84,6 +87,28 @@ class BoundaryRefinementTests(unittest.TestCase):
         self.assertEqual(end, 35.0)
         self.assertFalse(metadata["max_duration_clamped"])
         self.assertTrue(any("pre-roll" in decision for decision in decisions))
+
+    def test_podcast_padding_respects_max_duration(self):
+        context = [
+            {"start": 10.0, "end": 13.0, "text": "krótkie wprowadzenie", "speaker": "Speaker 0"},
+            {"start": 13.0, "end": 18.0, "text": "główna odpowiedź i sedno wypowiedzi", "speaker": "Speaker 0"},
+            {"start": 18.0, "end": 21.0, "text": "domknięcie myśli", "speaker": "Speaker 0"},
+        ]
+        window = {"start": 13.2, "end": 18.1, "duration": 4.9, "summary": "", "text": ""}
+        start, end, _decisions, metadata = refine_story_bounds_for_strategy(
+            13.2,
+            18.1,
+            context,
+            window,
+            max_duration=8.0,
+            min_duration=4.0,
+            strategy_name="podcast",
+        )
+
+        self.assertLessEqual(end - start, 8.0)
+        self.assertGreaterEqual(metadata["preroll_added"], 0.0)
+        self.assertGreaterEqual(metadata["postroll_added"], 0.0)
+        self.assertIn(metadata["context_padding_reason"], {"", "podcast_context_padding"})
 
 
 if __name__ == "__main__":

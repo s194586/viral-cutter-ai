@@ -34,6 +34,7 @@ KEYWORD_PATTERNS = [
     r"(?:wow|super|fantastycz|niesamowit|genialn|straszn|okropn)",
 ]
 KEYWORD_REGEX = re.compile("|".join(KEYWORD_PATTERNS), re.IGNORECASE | re.UNICODE)
+DEFAULT_SPEAKER_SMOOTHING_WINDOW = 1.25
 
 
 def parse_time(time_str: str) -> float:
@@ -88,6 +89,32 @@ def speaker_style(name: str) -> Dict[str, str]:
     return SPEAKER_STYLE_PALETTE[speaker_index % len(SPEAKER_STYLE_PALETTE)]
 
 
+def speaker_segment_duration(segment: Dict) -> float:
+    try:
+        return max(0.0, parse_time(segment.get("end", "00:00")) - parse_time(segment.get("start", "00:00")))
+    except Exception:
+        return 0.0
+
+
+def smooth_speaker_labels(transcript: List[Dict], *, max_flip_duration: float = DEFAULT_SPEAKER_SMOOTHING_WINDOW) -> List[Dict]:
+    if max_flip_duration <= 0 or len(transcript) < 3:
+        return [dict(item) for item in transcript]
+
+    smoothed = [dict(item) for item in transcript]
+    normalized = [normalize_speaker(item) for item in smoothed]
+    for index in range(1, len(smoothed) - 1):
+        previous_speaker = normalized[index - 1]
+        current_speaker = normalized[index]
+        next_speaker = normalized[index + 1]
+        if previous_speaker != next_speaker or current_speaker == previous_speaker:
+            continue
+        if speaker_segment_duration(smoothed[index]) > max_flip_duration:
+            continue
+        smoothed[index]["speaker"] = previous_speaker
+        normalized[index] = previous_speaker
+    return smoothed
+
+
 def collect_speaker_styles(events: List[Dict]) -> List[str]:
     speaker_names = {DEFAULT_STYLE_NAME, "Speaker 0"}
     for event in events:
@@ -132,11 +159,21 @@ def should_display_subtitle(segment: Dict, duration: float) -> bool:
     return True
 
 
-def build_subtitle_events(transcript: List[Dict], segment_start: float, segment_duration: float) -> List[Dict]:
+def build_subtitle_events(
+    transcript: List[Dict],
+    segment_start: float,
+    segment_duration: float,
+    *,
+    speaker_smoothing_window: float = DEFAULT_SPEAKER_SMOOTHING_WINDOW,
+) -> List[Dict]:
     events: List[Dict] = []
     segment_end = segment_start + segment_duration
+    transcript_for_events = smooth_speaker_labels(
+        transcript,
+        max_flip_duration=speaker_smoothing_window,
+    )
 
-    for item in transcript:
+    for item in transcript_for_events:
         seg_start = parse_time(item.get("start", "00:00"))
         seg_end = parse_time(item.get("end", "00:00"))
         text = str(item.get("text", "")).strip()

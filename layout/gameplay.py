@@ -7,6 +7,7 @@ def build_gameplay_layout() -> LayoutProfile:
     return LayoutProfile(
         content_type="gameplay",
         layout_mode="gameplay_priority_crop",
+        layout_policy="gameplay_safe_vertical",
         crop_priority="gameplay",
         allow_face_tracking=True,
         face_tracking_weight=0.2,

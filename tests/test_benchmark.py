@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from benchmark import (
     BenchmarkCase,
+    annotate_case_duplicates,
     build_next_human_review_targets,
     count_overlapping_windows,
     extract_human_review_rows_from_results,
@@ -34,6 +35,56 @@ class BenchmarkHelpersTests(unittest.TestCase):
             {"start": 99.5, "end": 129.8},
         ]
         self.assertEqual(count_overlapping_windows(left, right), 2)
+
+    def test_annotate_case_duplicates_prefers_auto_when_scores_are_close(self):
+        case_payload = {
+            "case_id": "case_a",
+            "scenarios": [
+                {
+                    "scenario_id": "auto",
+                    "status": "completed",
+                    "selection": {
+                        "clips": [
+                            {
+                                "index": 1,
+                                "start": 10.0,
+                                "end": 40.0,
+                                "start_label": "00:10.00",
+                                "end_label": "00:40.00",
+                                "duration": 30.0,
+                                "local_score": 91.0,
+                            }
+                        ]
+                    },
+                },
+                {
+                    "scenario_id": "manual_gameplay",
+                    "status": "completed",
+                    "selection": {
+                        "clips": [
+                            {
+                                "index": 1,
+                                "start": 10.5,
+                                "end": 39.8,
+                                "start_label": "00:10.50",
+                                "end_label": "00:39.80",
+                                "duration": 29.3,
+                                "local_score": 92.4,
+                            }
+                        ]
+                    },
+                },
+            ],
+        }
+        summary = annotate_case_duplicates(case_payload)
+        auto_clip = case_payload["scenarios"][0]["selection"]["clips"][0]
+        manual_clip = case_payload["scenarios"][1]["selection"]["clips"][0]
+
+        self.assertEqual(summary["duplicates_removed"], 1)
+        self.assertFalse(auto_clip["deduped"])
+        self.assertTrue(manual_clip["deduped"])
+        self.assertIn("case_a:auto:1", manual_clip["duplicate_of"])
+        self.assertGreaterEqual(manual_clip["overlap_ratio"], 0.67)
 
     def test_summarize_selection_metrics_collects_scores_and_reasons(self):
         windows = [

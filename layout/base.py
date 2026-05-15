@@ -22,6 +22,7 @@ VALID_LAYOUT_MODES = (
 class LayoutProfile:
     content_type: str
     layout_mode: str
+    layout_policy: str
     crop_priority: str
     allow_face_tracking: bool
     face_tracking_weight: float

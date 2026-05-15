@@ -7,6 +7,7 @@ def build_podcast_layout() -> LayoutProfile:
     return LayoutProfile(
         content_type="podcast",
         layout_mode="speaker_face_crop",
+        layout_policy="face_active_speaker",
         crop_priority="speaker_face",
         allow_face_tracking=True,
         face_tracking_weight=0.95,

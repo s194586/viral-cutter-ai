@@ -130,6 +130,49 @@ class ReviewDashboardTests(unittest.TestCase):
         self.assertEqual(clips[0].latest_review["human_relevance_score"], "4")
         self.assertEqual(clips[0].latest_review["notes"], "clean clip")
 
+    def test_collect_clips_skips_deduped_variants(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base = Path(temp_dir)
+            results = base / "results.json"
+            template = base / "template.csv"
+            reviews = base / "reviews.jsonl"
+            payload = {
+                "cases": [
+                    {
+                        "case_id": "case_a",
+                        "expected_content_type": "gameplay",
+                        "scenarios": [
+                            {
+                                "scenario_id": "auto",
+                                "status": "completed",
+                                "content_type_arg": "auto",
+                                "classification": {"detected_content_type": "gameplay"},
+                                "artifacts": {"subtitle_dir": "benchmarks/runs/test/case_a/auto/cuts_subtitles"},
+                                "selection": {
+                                    "clips": [
+                                        {
+                                            "index": 1,
+                                            "start": 10.0,
+                                            "end": 40.0,
+                                            "start_label": "00:10.00",
+                                            "end_label": "00:40.00",
+                                            "duration": 30.0,
+                                            "local_score": 91.2,
+                                            "deduped": True,
+                                        }
+                                    ]
+                                },
+                            }
+                        ],
+                    }
+                ]
+            }
+            results.write_text(json.dumps(payload), encoding="utf-8")
+            self._sample_template(template)
+            clips = review_dashboard.collect_clips(results, template, reviews)
+
+        self.assertEqual(clips, [])
+
     def test_write_and_read_jsonl_reviews(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "reviews.jsonl"
@@ -217,6 +260,57 @@ class ReviewDashboardTests(unittest.TestCase):
         self.assertTrue(reviews[0]["no_payoff"])
         self.assertFalse(reviews[0]["too_context_dependent"])
         self.assertEqual(reviews[0]["notes"], "good action, weak ending")
+
+    def test_review_summary_counts_flags_and_breakdowns(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base = Path(temp_dir)
+            results = base / "results.json"
+            template = base / "template.csv"
+            reviews = base / "reviews.jsonl"
+            self._sample_results(results)
+            self._sample_template(template)
+            reviews.write_text(
+                "\n".join(
+                    [
+                        json.dumps(
+                            {
+                                "clip_id": review_dashboard.stable_clip_id("case_a", "auto", "00:10.00", "00:40.00"),
+                                "rating": 4,
+                                "good_clip": True,
+                                "boundary_issue": True,
+                                "boring_setup": False,
+                                "no_payoff": True,
+                                "too_context_dependent": False,
+                            }
+                        ),
+                        json.dumps(
+                            {
+                                "clip_id": "missing_clip",
+                                "rating": 2,
+                                "good_clip": False,
+                                "boundary_issue": False,
+                                "boring_setup": True,
+                                "no_payoff": False,
+                                "too_context_dependent": True,
+                            }
+                        ),
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            summary = review_dashboard.summarize_review_file(
+                results_path=results,
+                template_path=template,
+                reviews_path=reviews,
+            )
+
+        self.assertEqual(summary["review_count"], 2)
+        self.assertEqual(summary["unmatched_review_count"], 1)
+        self.assertEqual(summary["flag_counts"]["boundary_issue"], 1)
+        self.assertEqual(summary["flag_counts"]["boring_setup"], 1)
+        self.assertEqual(summary["by_case"]["case_a"]["count"], 1)
+        self.assertEqual(summary["by_scenario"]["auto"]["count"], 1)
 
     def test_html_contains_video_source_for_existing_mp4(self):
         with tempfile.TemporaryDirectory() as temp_dir:

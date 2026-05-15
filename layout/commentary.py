@@ -7,6 +7,7 @@ def build_commentary_layout() -> LayoutProfile:
     return LayoutProfile(
         content_type="commentary",
         layout_mode="stable_subject_crop",
+        layout_policy="stable_subject_or_center",
         crop_priority="subject",
         allow_face_tracking=True,
         face_tracking_weight=0.45,

@@ -53,6 +53,8 @@ HUMAN_REVIEW_KEY_FIELDS = (
     "clip_start",
     "clip_end",
 )
+DEDUP_OVERLAP_THRESHOLD = 0.67
+DEDUP_AUTO_SCORE_DELTA = 2.5
 MIN_HUMAN_REVIEW_RECORDS_FOR_TUNING = 10
 HUMAN_REVIEW_TARGET_CASE_PRIORITY = {
     "emeritos_gameplay": 0,
@@ -299,6 +301,141 @@ def count_overlapping_windows(
             used_right.add(best_index)
             matches += 1
     return matches
+
+
+def clip_duplicate_ref(case_id: str, scenario_id: str, clip: dict[str, Any]) -> str:
+    return (
+        f"{case_id}:{scenario_id}:"
+        f"{clip.get('index', '?')}:{clip.get('start_label', '?')}->{clip.get('end_label', '?')}"
+    )
+
+
+def _duplicate_preference_key(case_id: str, scenario_id: str, clip: dict[str, Any]) -> tuple[float, float, float]:
+    local_score = float(clip.get("local_score", 0.0) or 0.0)
+    auto_bonus = 0.5 if scenario_id == "auto" else 0.0
+    earlier_bonus = -float(clip.get("start", 0.0) or 0.0)
+    return (round(local_score + auto_bonus, 4), local_score, earlier_bonus)
+
+
+def _choose_duplicate_winner(
+    case_id: str,
+    left: tuple[str, dict[str, Any]],
+    right: tuple[str, dict[str, Any]],
+) -> tuple[str, dict[str, Any]]:
+    left_scenario, left_clip = left
+    right_scenario, right_clip = right
+    left_score = float(left_clip.get("local_score", 0.0) or 0.0)
+    right_score = float(right_clip.get("local_score", 0.0) or 0.0)
+    if abs(left_score - right_score) <= DEDUP_AUTO_SCORE_DELTA:
+        if left_scenario == "auto" and right_scenario != "auto":
+            return left
+        if right_scenario == "auto" and left_scenario != "auto":
+            return right
+    if _duplicate_preference_key(case_id, left_scenario, left_clip) >= _duplicate_preference_key(case_id, right_scenario, right_clip):
+        return left
+    return right
+
+
+def annotate_case_duplicates(
+    case_payload: dict[str, Any],
+    *,
+    overlap_threshold: float = DEDUP_OVERLAP_THRESHOLD,
+) -> dict[str, Any]:
+    scenarios = [
+        scenario
+        for scenario in case_payload.get("scenarios", [])
+        if scenario.get("status") == "completed"
+    ]
+    clip_entries: list[dict[str, Any]] = []
+    for scenario in scenarios:
+        selection = scenario.setdefault("selection", {})
+        clips = selection.get("clips") or []
+        selection["removed_duplicates_count"] = 0
+        selection["kept_clip_count_after_dedup"] = len(clips)
+        for clip in clips:
+            clip["deduped"] = bool(clip.get("deduped", False))
+            clip["duplicate_of"] = str(clip.get("duplicate_of") or "")
+            clip["overlap_ratio"] = round(float(clip.get("overlap_ratio", 0.0) or 0.0), 4)
+            clip_entries.append(
+                {
+                    "scenario_id": str(scenario.get("scenario_id") or ""),
+                    "clip": clip,
+                }
+            )
+
+    duplicate_groups = 0
+    duplicates_removed = 0
+    visited: set[int] = set()
+    for start_index, entry in enumerate(clip_entries):
+        if start_index in visited:
+            continue
+        stack = [start_index]
+        component: set[int] = set()
+        while stack:
+            index = stack.pop()
+            if index in component:
+                continue
+            component.add(index)
+            for other_index in range(len(clip_entries)):
+                if other_index == index:
+                    continue
+                if interval_overlap_ratio(clip_entries[index]["clip"], clip_entries[other_index]["clip"]) >= overlap_threshold:
+                    stack.append(other_index)
+        visited.update(component)
+        if len(component) <= 1:
+            continue
+        duplicate_groups += 1
+        component_entries = [clip_entries[index] for index in sorted(component)]
+        winner = component_entries[0]
+        for contender in component_entries[1:]:
+            winner_scenario = str(winner["scenario_id"] or "")
+            contender_scenario = str(contender["scenario_id"] or "")
+            chosen_scenario, chosen_clip = _choose_duplicate_winner(
+                str(case_payload.get("case_id") or ""),
+                (winner_scenario, winner["clip"]),
+                (contender_scenario, contender["clip"]),
+            )
+            if chosen_clip is contender["clip"]:
+                winner = contender
+
+        winner_ref = clip_duplicate_ref(
+            str(case_payload.get("case_id") or ""),
+            str(winner["scenario_id"] or ""),
+            winner["clip"],
+        )
+        removed_for_winner = 0
+        for contender in component_entries:
+            scenario_id = str(contender["scenario_id"] or "")
+            scenario = next((item for item in scenarios if item.get("scenario_id") == scenario_id), None)
+            if contender is winner:
+                contender["clip"]["deduped"] = False
+                contender["clip"]["duplicate_of"] = ""
+                contender["clip"]["overlap_ratio"] = 0.0
+                continue
+            overlap = interval_overlap_ratio(contender["clip"], winner["clip"])
+            contender["clip"]["deduped"] = True
+            contender["clip"]["duplicate_of"] = winner_ref
+            contender["clip"]["overlap_ratio"] = round(overlap, 4)
+            if scenario is not None:
+                scenario["selection"]["removed_duplicates_count"] = int(
+                    scenario["selection"].get("removed_duplicates_count", 0) or 0
+                ) + 1
+            duplicates_removed += 1
+            removed_for_winner += 1
+        winner["clip"]["removed_duplicates_count"] = removed_for_winner
+
+    for scenario in scenarios:
+        clips = scenario.get("selection", {}).get("clips") or []
+        kept_count = sum(1 for clip in clips if not clip.get("deduped"))
+        scenario["selection"]["kept_clip_count_after_dedup"] = kept_count
+
+    summary = {
+        "overlap_threshold": overlap_threshold,
+        "duplicate_groups": duplicate_groups,
+        "duplicates_removed": duplicates_removed,
+    }
+    case_payload["deduplication"] = summary
+    return summary
 
 
 def summarize_score_distribution(values: list[float]) -> dict[str, float]:
@@ -758,6 +895,10 @@ def summarize_selection_metrics(
                 "local_features": window.get("local_features") or {},
                 "boundary_metadata": window.get("boundary_metadata") or {},
                 "summary": window.get("summary"),
+                "deduped": bool(window.get("deduped", False)),
+                "duplicate_of": str(window.get("duplicate_of") or ""),
+                "overlap_ratio": round(float(window.get("overlap_ratio", 0.0) or 0.0), 4),
+                "removed_duplicates_count": int(window.get("removed_duplicates_count", 0) or 0),
             }
         )
 
@@ -767,6 +908,8 @@ def summarize_selection_metrics(
         "duration_distribution": summarize_score_distribution(durations),
         "temporal_metrics": summarize_temporal_metrics(windows, material_duration=material_duration),
         "selection_reason_counts": dict(reasons.most_common()),
+        "removed_duplicates_count": 0,
+        "kept_clip_count_after_dedup": len(windows),
         "clips": clips,
     }
 
@@ -789,6 +932,7 @@ def summarize_rendering_metrics(
     crop_modes = Counter()
     crop_priorities = Counter()
     layout_modes = Counter()
+    layout_policies = Counter()
     tracking_modes = Counter()
     face_tracking_used_count = 0
     center_x_means = []
@@ -810,6 +954,8 @@ def summarize_rendering_metrics(
         ignored_faces_count += int(face_tracking.get("ignored_faces_count") or 0)
         if adjustment.get("layout_mode") or face_tracking.get("layout_mode"):
             layout_modes[str(adjustment.get("layout_mode") or face_tracking.get("layout_mode"))] += 1
+        if adjustment.get("layout_policy") or face_tracking.get("layout_policy"):
+            layout_policies[str(adjustment.get("layout_policy") or face_tracking.get("layout_policy"))] += 1
         if face_tracking.get("crop_mode"):
             crop_modes[str(face_tracking.get("crop_mode"))] += 1
         if face_tracking.get("crop_priority"):
@@ -853,6 +999,7 @@ def summarize_rendering_metrics(
         "zoom_samples": zoom_samples,
         "ignored_faces_count": ignored_faces_count,
         "layout_modes": dict(layout_modes),
+        "layout_policies": dict(layout_policies),
         "crop_modes": dict(crop_modes),
         "crop_priorities": dict(crop_priorities),
         "tracking_modes": dict(tracking_modes),
@@ -924,6 +1071,8 @@ def build_human_review_rows(
 ) -> list[dict[str, Any]]:
     rows = []
     for clip in selected_clips:
+        if bool(clip.get("deduped")):
+            continue
         clip_index = int(clip["index"])
         matching_files = sorted(subtitle_dir.glob(f"segment_{clip_index}_*.mp4"))
         clip_file = str(matching_files[0].relative_to(PROJECT_ROOT)) if matching_files else ""
@@ -1127,6 +1276,8 @@ def build_review_clip_lookup(case_payloads: list[dict[str, Any]]) -> dict[tuple[
                 continue
             subtitle_dir = scenario.get("artifacts", {}).get("subtitle_dir") or ""
             for clip in scenario.get("selection", {}).get("clips", []):
+                if bool(clip.get("deduped")):
+                    continue
                 clip_index = int(clip.get("index") or 0)
                 clip_file = ""
                 if subtitle_dir:
@@ -1149,6 +1300,9 @@ def build_review_clip_lookup(case_payloads: list[dict[str, Any]]) -> dict[tuple[
                     "selection_strategy": clip.get("selection_strategy"),
                     "selection_source": clip.get("selection_source"),
                     "boundary_metadata": clip.get("boundary_metadata") or {},
+                    "deduped": bool(clip.get("deduped", False)),
+                    "duplicate_of": clip.get("duplicate_of"),
+                    "overlap_ratio": clip.get("overlap_ratio"),
                     "strategy_render_hints": scenario.get("classification", {}).get("strategy_render_hints") or {},
                 }
                 lookup.setdefault(human_review_row_key(row), row)
@@ -2374,18 +2528,6 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
                 args,
             )
             scenarios.append(scenario_result)
-            if scenario_result.get("status") == "completed":
-                human_review_rows.extend(
-                    build_human_review_rows(
-                        case_id=case.case_id,
-                        case_label=case.label,
-                        expected_content_type=case.expected_content_type,
-                        scenario_id=scenario_result["scenario_id"],
-                        scenario_label=scenario_result["scenario_label"],
-                        selected_clips=scenario_result["selection"].get("clips", []),
-                        subtitle_dir=Path(PROJECT_ROOT / scenario_result["artifacts"]["subtitle_dir"]),
-                    )
-                )
 
         case_payload = {
             "case_id": case.case_id,
@@ -2413,6 +2555,20 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
                 "shared_heatmap": str(heatmap_path.relative_to(PROJECT_ROOT)),
             },
         }
+        annotate_case_duplicates(case_payload)
+        for scenario_result in scenarios:
+            if scenario_result.get("status") == "completed":
+                human_review_rows.extend(
+                    build_human_review_rows(
+                        case_id=case.case_id,
+                        case_label=case.label,
+                        expected_content_type=case.expected_content_type,
+                        scenario_id=scenario_result["scenario_id"],
+                        scenario_label=scenario_result["scenario_label"],
+                        selected_clips=scenario_result["selection"].get("clips", []),
+                        subtitle_dir=Path(PROJECT_ROOT / scenario_result["artifacts"]["subtitle_dir"]),
+                    )
+                )
         case_payload["findings"] = summarize_case_findings(
             case,
             transcript_metrics,

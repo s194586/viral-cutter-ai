@@ -38,6 +38,7 @@ def get_layout_profile(content_type: str | None, layout_mode: str | None = "auto
             return LayoutProfile(
                 content_type=normalized_type,
                 layout_mode="vertical_crop",
+                layout_policy="vertical_crop",
                 crop_priority="center",
                 allow_face_tracking=profile.allow_face_tracking,
                 face_tracking_weight=profile.face_tracking_weight,

@@ -740,6 +740,51 @@ def trim_gameplay_low_value_lead(start, end, context, *, min_duration):
     ]
 
 
+def apply_context_padding(start, end, context, *, strategy_name, max_duration):
+    if strategy_name not in {"commentary", "podcast"}:
+        return start, end, [], {"preroll_added": 0.0, "postroll_added": 0.0, "context_padding_reason": ""}
+
+    target_preroll = 1.5 if strategy_name == "commentary" else 1.2
+    target_postroll = 1.2 if strategy_name == "commentary" else 1.5
+    current_duration = max(0.0, end - start)
+    available_budget = max(0.0, max_duration - current_duration)
+    if available_budget <= 0.0:
+        return start, end, [], {"preroll_added": 0.0, "postroll_added": 0.0, "context_padding_reason": ""}
+
+    desired_preroll = min(target_preroll, available_budget)
+    desired_postroll = min(target_postroll, max(0.0, available_budget - desired_preroll))
+    padded_start = max(0.0, start - desired_preroll)
+    padded_end = end + desired_postroll
+    if context:
+        padded_start = boundary_start_for_time(context, padded_start)
+        padded_end = boundary_end_for_time(context, padded_end)
+
+    if padded_end - padded_start > max_duration:
+        padded_end = min(padded_end, padded_start + max_duration)
+        if context:
+            padded_end = boundary_end_for_time(context, padded_end)
+        if padded_end - padded_start > max_duration:
+            padded_end = padded_start + max_duration
+
+    preroll_added = round(max(0.0, start - padded_start), 4)
+    postroll_added = round(max(0.0, padded_end - end), 4)
+    if preroll_added <= 0.01 and postroll_added <= 0.01:
+        return start, end, [], {"preroll_added": 0.0, "postroll_added": 0.0, "context_padding_reason": ""}
+
+    reason = f"{strategy_name}_context_padding"
+    decisions = [
+        (
+            f"Added context padding for {strategy_name}: "
+            f"+{preroll_added:.2f}s pre-roll, +{postroll_added:.2f}s post-roll."
+        )
+    ]
+    return padded_start, padded_end, decisions, {
+        "preroll_added": preroll_added,
+        "postroll_added": postroll_added,
+        "context_padding_reason": reason,
+    }
+
+
 def refine_story_bounds_for_strategy(
     start,
     end,
@@ -768,6 +813,16 @@ def refine_story_bounds_for_strategy(
             adjusted_start = trimmed_start
             decisions.extend(trim_decisions)
 
+    adjusted_start, adjusted_end, padding_decisions, padding_metadata = apply_context_padding(
+        adjusted_start,
+        adjusted_end,
+        context,
+        strategy_name=strategy_name,
+        max_duration=max_duration,
+    )
+    if padding_decisions:
+        decisions.extend(padding_decisions)
+
     if adjusted_end - adjusted_start > max_duration:
         metadata["max_duration_clamped"] = True
         adjusted_end = adjusted_start + max_duration
@@ -776,6 +831,11 @@ def refine_story_bounds_for_strategy(
             adjusted_end = adjusted_start + max_duration
         decisions.append(f"Clamped refined clip to {max_duration:.0f}s maximum duration.")
 
+    metadata.update(padding_metadata)
+    metadata["boundary_refined"] = bool(abs(float(adjusted_start) - float(start)) > 0.02 or abs(float(adjusted_end) - float(end)) > 0.02)
+    metadata["preroll_added"] = round(max(0.0, float(start) - float(adjusted_start)), 4)
+    metadata["postroll_added"] = round(max(0.0, float(adjusted_end) - float(end)), 4)
+    metadata.setdefault("context_padding_reason", "")
     return adjusted_start, adjusted_end, decisions, metadata
 
 
@@ -947,6 +1007,10 @@ def build_local_selection(
         ),
         "speaker_turn_boundary_used": _speaker_turn_boundary_used(context, fallback_window["start"], fallback_window["end"]),
         "max_duration_clamped": bool(boundary_extra.get("max_duration_clamped", False)),
+        "boundary_refined": bool(boundary_extra.get("boundary_refined", False)),
+        "preroll_added": round(float(boundary_extra.get("preroll_added", 0.0) or 0.0), 4),
+        "postroll_added": round(float(boundary_extra.get("postroll_added", 0.0) or 0.0), 4),
+        "context_padding_reason": str(boundary_extra.get("context_padding_reason") or ""),
     }
     fallback_window["selection_source"] = "local_ranking"
     fallback_window["selection_reasons"] = window.get("selection_reasons") or []
@@ -1021,6 +1085,10 @@ def apply_batch_ai_selection(
         ),
         "speaker_turn_boundary_used": _speaker_turn_boundary_used(context, start, end),
         "max_duration_clamped": bool(boundary_extra.get("max_duration_clamped", False)),
+        "boundary_refined": bool(boundary_extra.get("boundary_refined", False)),
+        "preroll_added": round(float(boundary_extra.get("preroll_added", 0.0) or 0.0), 4),
+        "postroll_added": round(float(boundary_extra.get("postroll_added", 0.0) or 0.0), 4),
+        "context_padding_reason": str(boundary_extra.get("context_padding_reason") or ""),
     }
     text = collect_text_for_window(sentences, start, end)
     refined_window = dict(window)
