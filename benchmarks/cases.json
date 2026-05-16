@@ -15,6 +15,7 @@
       "comparison_content_types": [
         "podcast"
       ],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Current gameplay material available in the repository. It is the only full long-form benchmark case at the moment."
     },
@@ -33,6 +34,7 @@
       "comparison_content_types": [
         "podcast"
       ],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Added as a commentary benchmark. It is speech-heavy, but it is not a true podcast or tutorial."
     },
@@ -51,6 +53,7 @@
       "comparison_content_types": [
         "podcast"
       ],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Added as a commentary benchmark. It resembles a narrated commentary video more than a dialogue-driven podcast."
     },
@@ -69,6 +72,7 @@
       "comparison_content_types": [
         "podcast"
       ],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Added as a commentary benchmark. Useful for testing news-like monologue material against the dedicated commentary route."
     },
@@ -85,6 +89,7 @@
       "heatmap": "benchmarks/assets/magenta_team_podcast/metadata/heatmap.json",
       "info_json": "benchmarks/assets/magenta_team_podcast/metadata/source.info.json",
       "comparison_content_types": [],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Added to validate whether the classifier and diarization behave better on a true conversation than on commentary-like monologues."
     },
@@ -101,6 +106,7 @@
       "heatmap": "benchmarks/assets/canva_presentation_tutorial/metadata/heatmap.json",
       "info_json": "benchmarks/assets/canva_presentation_tutorial/metadata/source.info.json",
       "comparison_content_types": [],
+      "review_batch": "old_baseline",
       "include_generic_baseline": true,
       "notes": "Added to test the tutorial path before tuning classifier or strategy weights."
     }

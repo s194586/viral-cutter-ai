@@ -37,6 +37,16 @@ HUMAN_TEMPLATE_SCORE_FIELDS = (
     "human_boundary_score",
     "human_crop_score",
 )
+REVIEW_NOTE_KEYWORDS = {
+    "subtitles": ("subtitle", "subtitles", "napisy", "transcript"),
+    "speaker": ("speaker", "speakers", "mówca", "mowca", "kolor", "colors"),
+    "context": ("context", "kontekst", "bez kontekstu", "too_context"),
+    "cut too short": ("cut too short", "za wcześnie", "za wczes", "ucięte", "urwane", "połowie zdania", "polowie zdania"),
+    "boring": ("boring", "nudne", "nudny", "setup", "slow"),
+    "no payoff": ("no payoff", "brak payoffu", "bez payoffu", "weak payoff"),
+    "advertisement": ("advertisement", "ad ", "ad-like", "reklama", "sponsor", "intro", "czołówka", "czolowka"),
+    "language mistakes": ("language", "język", "jezyk", "grammar", "grammat", "spelling", "ortograf", "błędy", "bledy"),
+}
 
 
 @dataclass
@@ -199,6 +209,18 @@ def summarize_review_flags(reviews: list[dict[str, Any]]) -> dict[str, int]:
     for review in reviews:
         for key in summary:
             if bool(review.get(key)):
+                summary[key] += 1
+    return summary
+
+
+def summarize_review_note_keywords(reviews: list[dict[str, Any]]) -> dict[str, int]:
+    summary = {key: 0 for key in REVIEW_NOTE_KEYWORDS}
+    for review in reviews:
+        notes = str(review.get("notes") or "").strip().lower()
+        if not notes:
+            continue
+        for key, patterns in REVIEW_NOTE_KEYWORDS.items():
+            if any(pattern in notes for pattern in patterns):
                 summary[key] += 1
     return summary
 
@@ -758,9 +780,23 @@ def summarize_review_file(
             (by_case, clip.case_id),
             (by_scenario, clip.scenario_id),
         ):
-            entry = bucket.setdefault(key, {"count": 0, "rating_total": 0.0})
+            entry = bucket.setdefault(
+                key,
+                {
+                    "count": 0,
+                    "rating_total": 0.0,
+                    "good_clip_count": 0,
+                    "boundary_issue_count": 0,
+                    "no_payoff_count": 0,
+                    "too_context_dependent_count": 0,
+                },
+            )
             entry["count"] += 1
             entry["rating_total"] += float(review.get("rating") or 0.0)
+            entry["good_clip_count"] += 1 if bool(review.get("good_clip")) else 0
+            entry["boundary_issue_count"] += 1 if bool(review.get("boundary_issue")) else 0
+            entry["no_payoff_count"] += 1 if bool(review.get("no_payoff")) else 0
+            entry["too_context_dependent_count"] += 1 if bool(review.get("too_context_dependent")) else 0
 
     def finalize(bucket: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
         payload: dict[str, dict[str, Any]] = {}
@@ -770,14 +806,20 @@ def summarize_review_file(
             payload[key] = {
                 "count": count,
                 "average_rating": round(rating_total / count, 4) if count else 0.0,
+                "good_clip_ratio": round(float(value.get("good_clip_count") or 0) / count, 4) if count else 0.0,
+                "boundary_issue_count": int(value.get("boundary_issue_count") or 0),
+                "no_payoff_count": int(value.get("no_payoff_count") or 0),
+                "too_context_dependent_count": int(value.get("too_context_dependent_count") or 0),
             }
         return payload
 
     ratings = [float(review.get("rating") or 0.0) for review in reviews if review.get("rating") is not None]
+
     return {
         "review_count": len(reviews),
         "average_rating": round(sum(ratings) / len(ratings), 4) if ratings else 0.0,
         "flag_counts": summarize_review_flags(reviews),
+        "note_keyword_counts": summarize_review_note_keywords(reviews),
         "by_case": finalize(by_case),
         "by_scenario": finalize(by_scenario),
         "clips_in_results": len(clips),

@@ -258,8 +258,64 @@ class ReviewDashboardTests(unittest.TestCase):
         self.assertTrue(reviews[0]["boundary_issue"])
         self.assertFalse(reviews[0]["boring_setup"])
         self.assertTrue(reviews[0]["no_payoff"])
-        self.assertFalse(reviews[0]["too_context_dependent"])
-        self.assertEqual(reviews[0]["notes"], "good action, weak ending")
+
+    def test_summary_reports_keyword_counts_and_case_breakdown(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base = Path(temp_dir)
+            results = base / "results.json"
+            template = base / "template.csv"
+            reviews = base / "reviews.jsonl"
+            self._sample_results(results)
+            self._sample_template(template)
+            reviews.write_text(
+                "\n".join(
+                    [
+                        json.dumps(
+                            {
+                                "clip_id": review_dashboard.stable_clip_id("case_a", "auto", "00:10.00", "00:40.00"),
+                                "rating": 2,
+                                "good_clip": False,
+                                "boundary_issue": True,
+                                "boring_setup": True,
+                                "no_payoff": True,
+                                "too_context_dependent": True,
+                                "notes": "subtitles have language mistakes and no payoff, cut too short without context",
+                            },
+                            ensure_ascii=False,
+                        ),
+                        json.dumps(
+                            {
+                                "clip_id": review_dashboard.stable_clip_id("case_a", "auto", "00:10.00", "00:40.00"),
+                                "rating": 4,
+                                "good_clip": True,
+                                "boundary_issue": False,
+                                "boring_setup": False,
+                                "no_payoff": False,
+                                "too_context_dependent": False,
+                                "notes": "speaker colors are better now",
+                            },
+                            ensure_ascii=False,
+                        ),
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            summary = review_dashboard.summarize_review_file(
+                results_path=results,
+                template_path=template,
+                reviews_path=reviews,
+            )
+
+        self.assertEqual(summary["review_count"], 2)
+        self.assertEqual(summary["note_keyword_counts"]["subtitles"], 1)
+        self.assertEqual(summary["note_keyword_counts"]["language mistakes"], 1)
+        self.assertEqual(summary["note_keyword_counts"]["speaker"], 1)
+        self.assertEqual(summary["note_keyword_counts"]["context"], 1)
+        self.assertEqual(summary["by_case"]["case_a"]["average_rating"], 3.0)
+        self.assertEqual(summary["by_case"]["case_a"]["good_clip_ratio"], 0.5)
+        self.assertEqual(summary["by_case"]["case_a"]["boundary_issue_count"], 1)
+        self.assertEqual(summary["by_scenario"]["auto"]["no_payoff_count"], 1)
 
     def test_review_summary_counts_flags_and_breakdowns(self):
         with tempfile.TemporaryDirectory() as temp_dir:

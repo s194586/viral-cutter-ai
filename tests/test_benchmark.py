@@ -200,6 +200,8 @@ class BenchmarkHelpersTests(unittest.TestCase):
         self.assertTrue(summary["speaker_smoothing_enabled"])
         self.assertGreaterEqual(summary["effective_speaker_count"], 1)
         self.assertIn("Speaker 0", summary["speaker_color_map"])
+        self.assertIn("merged_low_duration_speakers", summary)
+        self.assertIn("subtitles_corrected", summary)
 
     def test_write_outputs_create_files(self):
         rows = [
@@ -326,6 +328,29 @@ class BenchmarkHelpersTests(unittest.TestCase):
             cases = load_cases(config_path)
             self.assertEqual(len(cases), 1)
             self.assertEqual(cases[0].expected_content_type, "commentary")
+
+    def test_load_cases_reads_review_batch(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base = Path(temp_dir)
+            config_path = base / "cases.json"
+            config_path.write_text(
+                json.dumps(
+                    {
+                        "cases": [
+                            {
+                                "id": "batched_case",
+                                "expected_content_type": "generic",
+                                "expected_speaker_mode": "single_speaker",
+                                "video": "clip.mp4",
+                                "review_batch": "semantic_v1",
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            cases = load_cases(config_path)
+            self.assertEqual(cases[0].review_batch, "semantic_v1")
 
     def test_merge_human_review_rows_preserves_existing_scores(self):
         generated = [

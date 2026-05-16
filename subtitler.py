@@ -8,6 +8,13 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+from semantic_clip_director import (
+    SUBTITLE_CORRECTION_MODE_OFF,
+    VALID_SUBTITLE_CORRECTION_MODES,
+    build_subtitle_corrector,
+    normalize_subtitle_correction_mode,
+)
+
 SPEAKER_STYLE_PALETTE: List[Dict[str, str]] = [
     {"primary": "&H00FFFFFF", "outline": "&H0000FFFF"},
     {"primary": "&H00FFCC00", "outline": "&H00000000"},
@@ -35,6 +42,7 @@ KEYWORD_PATTERNS = [
 ]
 KEYWORD_REGEX = re.compile("|".join(KEYWORD_PATTERNS), re.IGNORECASE | re.UNICODE)
 DEFAULT_SPEAKER_SMOOTHING_WINDOW = 1.25
+DEFAULT_SUBTITLE_CORRECTION_MODEL = "models/gemini-2.5-flash"
 
 
 def parse_time(time_str: str) -> float:
@@ -172,6 +180,96 @@ def speaker_color_map(speaker_names: List[str]) -> Dict[str, Dict[str, str]]:
     return mapping
 
 
+def resolve_effective_speaker_cap(
+    *,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    max_effective_speakers: int | None = None,
+) -> int | None:
+    if isinstance(max_effective_speakers, int) and max_effective_speakers > 0:
+        return max_effective_speakers
+    normalized_content = str(content_type_hint or "").strip().lower()
+    normalized_mode = str(expected_speaker_mode or "unknown").strip().lower()
+    if normalized_mode == "single" or normalized_content in {"commentary", "tutorial"}:
+        return 2
+    return None
+
+
+def _nearest_kept_speaker(index: int, events: List[Dict], keep_speakers: set[str], dominant_speaker: str) -> str:
+    for offset in range(1, len(events)):
+        left = index - offset
+        if left >= 0 and events[left].get("speaker") in keep_speakers:
+            return str(events[left].get("speaker") or dominant_speaker)
+        right = index + offset
+        if right < len(events) and events[right].get("speaker") in keep_speakers:
+            return str(events[right].get("speaker") or dominant_speaker)
+    return dominant_speaker
+
+
+def stabilize_speaker_events(
+    events: List[Dict],
+    *,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    max_effective_speakers: int | None = None,
+) -> Tuple[List[Dict], Dict[str, object]]:
+    if not events:
+        return [], {
+            "merged_low_duration_speakers": [],
+            "speaker_stability_reason": "no_events",
+            "detected_speaker_count": 0,
+            "effective_speaker_count": 0,
+        }
+    cap = resolve_effective_speaker_cap(
+        content_type_hint=content_type_hint,
+        expected_speaker_mode=expected_speaker_mode,
+        max_effective_speakers=max_effective_speakers,
+    )
+    normalized = [dict(event) for event in events]
+    durations: Dict[str, float] = {}
+    for event in normalized:
+        speaker = normalize_speaker({"speaker": event.get("speaker")})
+        event["speaker"] = speaker
+        if speaker == DEFAULT_STYLE_NAME:
+            continue
+        durations[speaker] = durations.get(speaker, 0.0) + max(0.0, float(event.get("end", 0.0)) - float(event.get("start", 0.0)))
+    detected_speakers = [speaker for speaker in durations.keys() if speaker != DEFAULT_STYLE_NAME]
+    if cap is None or len(detected_speakers) <= cap:
+        return normalized, {
+            "merged_low_duration_speakers": [],
+            "speaker_stability_reason": "within_effective_cap" if cap else "no_effective_cap",
+            "detected_speaker_count": len(detected_speakers),
+            "effective_speaker_count": len(detected_speakers),
+        }
+
+    sorted_speakers = sorted(durations.items(), key=lambda item: item[1], reverse=True)
+    dominant_speaker = sorted_speakers[0][0]
+    keep_speakers = {speaker for speaker, _duration in sorted_speakers[:cap]}
+    total_duration = sum(durations.values()) or 1.0
+    merged_speakers: list[str] = []
+    for index, event in enumerate(normalized):
+        speaker = str(event.get("speaker") or DEFAULT_STYLE_NAME)
+        if speaker == DEFAULT_STYLE_NAME or speaker in keep_speakers:
+            continue
+        speaker_duration = durations.get(speaker, 0.0)
+        speaker_share = speaker_duration / total_duration
+        if len(detected_speakers) >= 6 or speaker_duration <= 1.5 or speaker_share <= 0.12:
+            replacement = _nearest_kept_speaker(index, normalized, keep_speakers, dominant_speaker)
+            event["speaker"] = replacement
+            if speaker not in merged_speakers:
+                merged_speakers.append(speaker)
+
+    effective_speakers = sorted(
+        {str(event.get("speaker") or DEFAULT_STYLE_NAME) for event in normalized if str(event.get("speaker") or DEFAULT_STYLE_NAME) != DEFAULT_STYLE_NAME}
+    )
+    return normalized, {
+        "merged_low_duration_speakers": merged_speakers,
+        "speaker_stability_reason": "merged_low_duration_speakers" if merged_speakers else "no_merge_needed",
+        "detected_speaker_count": len(detected_speakers),
+        "effective_speaker_count": len(effective_speakers),
+    }
+
+
 def ass_color(color_value: str) -> str:
     return f"\\c{color_value}&" if color_value.endswith("&") else f"\\c{color_value}&"
 
@@ -210,12 +308,26 @@ def build_subtitle_events(
     segment_duration: float,
     *,
     speaker_smoothing_window: float = DEFAULT_SPEAKER_SMOOTHING_WINDOW,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    max_effective_speakers: int | None = None,
+    subtitle_correction_mode: str = SUBTITLE_CORRECTION_MODE_OFF,
+    semantic_model: str = DEFAULT_SUBTITLE_CORRECTION_MODEL,
+    api_key: str | None = None,
+    request_timeout: float = 45.0,
 ) -> List[Dict]:
     events, _metadata = build_subtitle_events_with_metadata(
         transcript,
         segment_start,
         segment_duration,
         speaker_smoothing_window=speaker_smoothing_window,
+        content_type_hint=content_type_hint,
+        expected_speaker_mode=expected_speaker_mode,
+        max_effective_speakers=max_effective_speakers,
+        subtitle_correction_mode=subtitle_correction_mode,
+        semantic_model=semantic_model,
+        api_key=api_key,
+        request_timeout=request_timeout,
     )
     return events
 
@@ -226,8 +338,15 @@ def build_subtitle_events_with_metadata(
     segment_duration: float,
     *,
     speaker_smoothing_window: float = DEFAULT_SPEAKER_SMOOTHING_WINDOW,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    max_effective_speakers: int | None = None,
+    subtitle_correction_mode: str = SUBTITLE_CORRECTION_MODE_OFF,
+    semantic_model: str = DEFAULT_SUBTITLE_CORRECTION_MODEL,
+    api_key: str | None = None,
+    request_timeout: float = 45.0,
 ) -> Tuple[List[Dict], Dict[str, object]]:
-    events: List[Dict] = []
+    raw_events: List[Dict] = []
     segment_end = segment_start + segment_duration
     transcript_for_events, smoothing_metadata = smooth_speaker_labels(
         transcript,
@@ -255,21 +374,59 @@ def build_subtitle_events_with_metadata(
         if not should_display_subtitle(item, rel_end - rel_start):
             continue
 
-        display_text = text if importance >= 5 else (apply_emphasis(text, speaker) if importance >= 4 else text)
-        events.append(
+        raw_events.append(
             {
                 "start": rel_start,
                 "end": rel_end,
-                "text": display_text,
+                "text": text,
                 "speaker": speaker,
                 "importance": importance,
                 "chaos": chaos,
             }
         )
 
+    stabilized_events, speaker_stability_metadata = stabilize_speaker_events(
+        raw_events,
+        content_type_hint=content_type_hint,
+        expected_speaker_mode=expected_speaker_mode,
+        max_effective_speakers=max_effective_speakers,
+    )
+    correction_mode = normalize_subtitle_correction_mode(subtitle_correction_mode)
+    if correction_mode == SUBTITLE_CORRECTION_MODE_OFF:
+        corrected_events = [dict(event) for event in stabilized_events]
+        correction_metadata = {
+            "subtitles_corrected": False,
+            "subtitle_corrector_used": "off",
+            "corrected_segments_count": 0,
+            "correction_fallback_reason": "",
+        }
+    else:
+        corrector = build_subtitle_corrector(
+            mode=correction_mode,
+            model_name=semantic_model,
+            request_timeout=request_timeout,
+            api_key=api_key,
+        )
+        corrected_events, correction_metadata = corrector.correct_subtitle_text(
+            stabilized_events,
+            mode=correction_mode,
+            content_type_hint=content_type_hint,
+        )
+
+    events: List[Dict] = []
+    for event in corrected_events:
+        display_text = event["text"] if int(event.get("importance", 3)) >= 5 else (
+            apply_emphasis(str(event["text"]), str(event["speaker"]))
+            if int(event.get("importance", 3)) >= 4
+            else event["text"]
+        )
+        events.append({**event, "text": display_text})
+
     speaker_names = collect_speaker_styles(events)
     metadata: Dict[str, object] = {
         **smoothing_metadata,
+        **speaker_stability_metadata,
+        **correction_metadata,
         "speaker_color_map": speaker_color_map(speaker_names),
         "speaker_smoothing_enabled": bool(smoothing_metadata.get("speaker_smoothing_enabled", False)),
         "speaker_smoothing_window": float(smoothing_metadata.get("speaker_smoothing_window", speaker_smoothing_window)),
@@ -379,18 +536,50 @@ def add_subtitles_to_video(input_video: Path, output_video: Path, ass_file: Path
     subprocess.run(cmd, check=True)
 
 
-def process_cut_file(cut_file: Path, transcript: List[Dict], output_raw: Path, output_subs: Path) -> None:
+def process_cut_file(
+    cut_file: Path,
+    transcript: List[Dict],
+    output_raw: Path,
+    output_subs: Path,
+    *,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    max_effective_speakers: int | None = None,
+    subtitle_correction_mode: str = SUBTITLE_CORRECTION_MODE_OFF,
+    semantic_model: str = DEFAULT_SUBTITLE_CORRECTION_MODEL,
+    api_key: str | None = None,
+    request_timeout: float = 45.0,
+) -> None:
     output_raw.mkdir(parents=True, exist_ok=True)
     output_subs.mkdir(parents=True, exist_ok=True)
 
     segment_start, segment_end = extract_segment_time_from_filename(cut_file.name)
     segment_duration = segment_end - segment_start
-    events, subtitle_debug = build_subtitle_events_with_metadata(transcript, segment_start, segment_duration)
+    events, subtitle_debug = build_subtitle_events_with_metadata(
+        transcript,
+        segment_start,
+        segment_duration,
+        content_type_hint=content_type_hint,
+        expected_speaker_mode=expected_speaker_mode,
+        max_effective_speakers=max_effective_speakers,
+        subtitle_correction_mode=subtitle_correction_mode,
+        semantic_model=semantic_model,
+        api_key=api_key,
+        request_timeout=request_timeout,
+    )
     if not events:
         print(f"  Warning: no subtitle events for {cut_file.name}")
     if subtitle_debug.get("speaker_flips_smoothed"):
         print(
             f"  Speaker smoothing merged {subtitle_debug['speaker_flips_smoothed']} short flip(s) "
+            f"for {cut_file.name}"
+        )
+    if subtitle_debug.get("merged_low_duration_speakers"):
+        merged = ", ".join(subtitle_debug["merged_low_duration_speakers"])
+        print(f"  Speaker sanity merged unstable labels ({merged}) for {cut_file.name}")
+    if subtitle_debug.get("subtitles_corrected"):
+        print(
+            f"  Subtitle correction updated {subtitle_debug.get('corrected_segments_count', 0)} segment(s) "
             f"for {cut_file.name}"
         )
 
@@ -422,6 +611,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-dir", default="cuts", help="Input directory with segment videos")
     parser.add_argument("--output-raw", default="cuts/raw", help="Output directory for raw cuts")
     parser.add_argument("--output-subs", default="cuts/subtitles", help="Output directory for subtitled videos")
+    parser.add_argument("--content-type", default="generic", help="Content type hint for subtitle speaker stabilization")
+    parser.add_argument("--expected-speaker-mode", default="unknown", help="Expected speaker mode hint: single, multi or unknown")
+    parser.add_argument("--max-effective-speakers", type=int, default=0, help="Optional cap for subtitle speaker labels")
+    parser.add_argument(
+        "--subtitle-correction-mode",
+        default="off",
+        choices=VALID_SUBTITLE_CORRECTION_MODES,
+        help="Subtitle correction mode: off, local_only, gemini_optional or gemini_required",
+    )
+    parser.add_argument("--semantic-model", default=DEFAULT_SUBTITLE_CORRECTION_MODEL, help="Gemini model for optional subtitle correction")
+    parser.add_argument("--request-timeout", type=float, default=45.0, help="Timeout in seconds for optional subtitle correction")
     return parser.parse_args()
 
 
@@ -450,7 +650,19 @@ def main() -> None:
     print()
     for cut_file in cut_files:
         print(f"Processing: {cut_file.name}")
-        process_cut_file(cut_file, transcript, output_raw, output_subs)
+        process_cut_file(
+            cut_file,
+            transcript,
+            output_raw,
+            output_subs,
+            content_type_hint=args.content_type,
+            expected_speaker_mode=args.expected_speaker_mode,
+            max_effective_speakers=args.max_effective_speakers or None,
+            subtitle_correction_mode=args.subtitle_correction_mode,
+            semantic_model=args.semantic_model,
+            api_key=None,
+            request_timeout=args.request_timeout,
+        )
         print()
 
     print("Done!")

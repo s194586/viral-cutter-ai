@@ -6,6 +6,7 @@ import re
 import shutil
 import ssl
 import subprocess
+import sys
 import time
 import warnings
 from bisect import bisect_left
@@ -27,6 +28,14 @@ from pipeline_modes import (
     allows_gemini,
     normalize_ai_mode,
     requires_gemini,
+)
+from semantic_clip_director import (
+    ClipDirectorError,
+    SEMANTIC_DIRECTOR_MODE_OFF,
+    VALID_SEMANTIC_DIRECTOR_MODES,
+    build_clip_director,
+    clamp_score,
+    normalize_semantic_director_mode,
 )
 from strategies import get_strategy
 
@@ -1295,6 +1304,148 @@ def apply_batch_ai_selection(
     return refined_window, decision
 
 
+def apply_semantic_director_selection(
+    selected_windows,
+    candidate_pool,
+    sentences,
+    *,
+    top_count,
+    min_duration,
+    max_duration,
+    context_margin,
+    strategy_name,
+    semantic_director_mode,
+    semantic_model,
+    request_timeout,
+    api_key,
+    selection_context=None,
+):
+    semantic_director_mode = normalize_semantic_director_mode(semantic_director_mode)
+    if semantic_director_mode == SEMANTIC_DIRECTOR_MODE_OFF:
+        return selected_windows, {
+            "mode": semantic_director_mode,
+            "used": False,
+            "reviewed_candidates": 0,
+            "rejected_candidates": 0,
+            "boundary_adjusted_candidates": 0,
+            "fallback_reason": "semantic_director_disabled",
+        }
+
+    director = build_clip_director(
+        mode=semantic_director_mode,
+        model_name=semantic_model,
+        request_timeout=request_timeout,
+        api_key=api_key,
+    )
+    ordered_candidates = list(selected_windows)
+    selected_ids = {item.get("candidate_id") for item in ordered_candidates if item.get("candidate_id")}
+    for candidate in candidate_pool:
+        if candidate.get("candidate_id") not in selected_ids:
+            ordered_candidates.append(candidate)
+
+    final_windows = []
+    reviewed_candidates = 0
+    rejected_candidates = 0
+    boundary_adjusted_candidates = 0
+    fallback_reason = ""
+
+    for item in ordered_candidates:
+        if len(final_windows) >= top_count:
+            break
+        if "boundary_metadata" in item:
+            window = dict(item)
+        else:
+            window, _decision = build_local_selection(
+                item,
+                sentences,
+                index=len(final_windows) + 1,
+                max_duration=max_duration,
+                context_margin=context_margin,
+                reason="Semantic director backfill from local pool.",
+                min_duration=min_duration,
+                strategy_name=strategy_name,
+            )
+        context_segments = collect_context(sentences, window["start"], window["end"], margin=context_margin)
+        reviewed_candidates += 1
+        try:
+            review = director.review_candidate(
+                window,
+                case_id=(selection_context or {}).get("case_id"),
+                title=(selection_context or {}).get("title"),
+                content_type=(selection_context or {}).get("content_type") or strategy_name,
+                detected_speakers=sorted({segment.get("speaker") for segment in context_segments if segment.get("speaker")}),
+                context_segments=context_segments,
+            )
+        except ClipDirectorError as exc:
+            if semantic_director_mode.endswith("required"):
+                raise
+            fallback_reason = str(exc)
+            break
+
+        reject = bool(review.get("advertisement_or_intro")) or not bool(review.get("keep", True))
+        semantic_bounds = director.refine_boundaries(
+            window,
+            review,
+            context_segments,
+            min_duration=min_duration,
+            max_duration=max_duration,
+        )
+        if reject:
+            rejected_candidates += 1
+            continue
+
+        if semantic_bounds["semantic_boundary_adjusted"]:
+            boundary_adjusted_candidates += 1
+
+        updated_window = dict(window)
+        updated_window["start"] = semantic_bounds["start"]
+        updated_window["end"] = semantic_bounds["end"]
+        updated_window["duration"] = round(semantic_bounds["end"] - semantic_bounds["start"], 4)
+        updated_window["summary"] = summarize_text(
+            collect_text_for_window(sentences, semantic_bounds["start"], semantic_bounds["end"])
+        )
+        updated_window["text"] = collect_text_for_window(sentences, semantic_bounds["start"], semantic_bounds["end"])
+        updated_window["semantic_director_used"] = bool(review.get("semantic_director_used", False))
+        updated_window["semantic_model"] = str(review.get("semantic_model") or "")
+        updated_window["story_score"] = clamp_score(review.get("story_score"), 0.0)
+        updated_window["hook_score"] = clamp_score(review.get("hook_score"), 0.0)
+        updated_window["context_score"] = clamp_score(review.get("context_score"), 0.0)
+        updated_window["payoff_score"] = clamp_score(review.get("payoff_score"), 0.0)
+        updated_window["semantic_reason"] = str(review.get("reason") or "").strip()
+        updated_window["semantic_boundary_adjusted"] = bool(semantic_bounds["semantic_boundary_adjusted"])
+        updated_window["semantic_fallback_reason"] = str(
+            semantic_bounds.get("semantic_fallback_reason")
+            or review.get("semantic_fallback_reason")
+            or ""
+        ).strip()
+        boundary_metadata = dict(updated_window.get("boundary_metadata") or {})
+        boundary_metadata["semantic_boundary_adjusted"] = bool(semantic_bounds["semantic_boundary_adjusted"])
+        boundary_metadata["semantic_fallback_reason"] = updated_window["semantic_fallback_reason"]
+        boundary_metadata["semantic_adjustment_reason"] = semantic_bounds.get("adjustments") or []
+        updated_window["boundary_metadata"] = boundary_metadata
+        final_windows.append(updated_window)
+
+    if not final_windows:
+        return selected_windows, {
+            "mode": semantic_director_mode,
+            "used": False,
+            "reviewed_candidates": reviewed_candidates,
+            "rejected_candidates": rejected_candidates,
+            "boundary_adjusted_candidates": boundary_adjusted_candidates,
+            "fallback_reason": fallback_reason or "semantic_director_kept_no_candidates",
+        }
+
+    return final_windows, {
+        "mode": semantic_director_mode,
+        "used": True,
+        "model": semantic_model if any(window.get("semantic_director_used") for window in final_windows) else "",
+        "reviewed_candidates": reviewed_candidates,
+        "rejected_candidates": rejected_candidates,
+        "boundary_adjusted_candidates": boundary_adjusted_candidates,
+        "fallback_reason": fallback_reason,
+    }
+
+
 def save_cutting_log(log_path, log):
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as file_handle:
@@ -1372,6 +1523,8 @@ def rerank_cuts_with_ai(
     request_timeout,
     selection_context=None,
     min_duration=20.0,
+    semantic_director_mode=SEMANTIC_DIRECTOR_MODE_OFF,
+    semantic_model="models/gemini-2.5-flash",
 ):
     local_candidate_snapshots = [
         {
@@ -1521,6 +1674,23 @@ def rerank_cuts_with_ai(
     log["batch_rerank_reason"] = batch_reason
     log["clips_refined_with_ai"] = refined_count
     log["clips_with_local_fallback"] = max(0, len(final_windows) - refined_count)
+    semantic_windows, semantic_summary = apply_semantic_director_selection(
+        final_windows,
+        candidate_pool,
+        sentences,
+        top_count=top_count,
+        min_duration=min_duration,
+        max_duration=max_duration,
+        context_margin=context_margin,
+        strategy_name=strategy_name,
+        semantic_director_mode=semantic_director_mode,
+        semantic_model=semantic_model,
+        request_timeout=request_timeout,
+        api_key=api_key,
+        selection_context=selection_context,
+    )
+    log["semantic_director"] = semantic_summary
+    final_windows = semantic_windows
     save_cutting_log(log_path, log)
     return final_windows, log
 
@@ -1603,6 +1773,17 @@ def parse_args():
     parser.add_argument("--ai-mode", default="gemini_optional", choices=VALID_AI_MODES, help="Selection mode: local_only, gemini_optional, gemini_enabled")
     parser.add_argument("--context-margin", type=float, default=20.0, help="Transcript margin around each window")
     parser.add_argument("--request-timeout", type=float, default=75.0, help="Gemini timeout in seconds per selected scene")
+    parser.add_argument(
+        "--semantic-director-mode",
+        default="off",
+        choices=VALID_SEMANTIC_DIRECTOR_MODES,
+        help="Optional semantic story reviewer: off, local_only, gemini_optional or gemini_required.",
+    )
+    parser.add_argument(
+        "--semantic-model",
+        default="models/gemini-2.5-flash",
+        help="Gemini model for semantic clip review and optional subtitle correction hooks.",
+    )
     parser.add_argument("--rerank-pool-size", type=int, default=0, help="How many locally ranked non-overlapping candidates to expose to Gemini batch rerank")
     parser.add_argument("--cutting-log", default="metadata/cutting_logic.json", help="Output log for cutting logic")
     parser.add_argument(
@@ -1616,6 +1797,10 @@ def parse_args():
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     args = parse_args()
     bootstrap_ssl_certificates()
 
@@ -1629,7 +1814,10 @@ def main():
     sentences = build_sentence_boundaries(transcript)
     heatmap_index, heatmap_starts = build_heatmap_index(heatmap)
     ai_mode = AI_MODE_LOCAL_ONLY if args.skip_smart_context else normalize_ai_mode(args.ai_mode)
+    semantic_director_mode = normalize_semantic_director_mode(args.semantic_director_mode)
     content_routing, strategy = resolve_content_routing(args)
+    content_routing["case_id"] = Path(args.video).stem if args.video else ""
+    content_routing["title"] = Path(args.video).stem if args.video else ""
 
     print(
         f"  Content classification: {content_routing['content_type']} "
@@ -1681,6 +1869,8 @@ def main():
             request_timeout=args.request_timeout,
             selection_context=content_routing,
             min_duration=args.min_duration,
+            semantic_director_mode=semantic_director_mode,
+            semantic_model=args.semantic_model,
         )
         fallback_count = cutting_log.get("clips_with_local_fallback", 0)
         if fallback_count:
@@ -1700,6 +1890,8 @@ def main():
             request_timeout=args.request_timeout,
             selection_context=content_routing,
             min_duration=args.min_duration,
+            semantic_director_mode=semantic_director_mode,
+            semantic_model=args.semantic_model,
         )
         print("  AI rerank skipped: local_only mode is active.")
 

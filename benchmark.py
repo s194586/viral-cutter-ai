@@ -28,6 +28,12 @@ from pipeline_modes import (
     subtitle_checker_sample_limit,
     subtitle_checker_uses_ai,
 )
+from semantic_clip_director import (
+    SEMANTIC_DIRECTOR_MODE_OFF,
+    SUBTITLE_CORRECTION_MODE_OFF,
+    VALID_SEMANTIC_DIRECTOR_MODES,
+    VALID_SUBTITLE_CORRECTION_MODES,
+)
 
 
 VALID_CONTENT_TYPES = ("podcast", "gameplay", "tutorial", "commentary", "generic")
@@ -123,6 +129,7 @@ class BenchmarkCase:
     comparison_content_types: list[str]
     include_generic_baseline: bool
     notes: str
+    review_batch: str = "old_baseline"
 
 
 def resolve_path(value: str | None, base_dir: Path) -> Path | None:
@@ -581,6 +588,7 @@ def load_cases(config_path: Path) -> list[BenchmarkCase]:
                 comparison_content_types=comparison_content_types,
                 include_generic_baseline=bool(raw_case.get("include_generic_baseline", True)),
                 notes=str(raw_case.get("notes") or "").strip(),
+                review_batch=str(raw_case.get("review_batch") or "old_baseline").strip() or "old_baseline",
             )
         )
     return cases
@@ -905,6 +913,15 @@ def summarize_selection_metrics(
                 "duplicate_of": str(window.get("duplicate_of") or ""),
                 "overlap_ratio": round(float(window.get("overlap_ratio", 0.0) or 0.0), 4),
                 "removed_duplicates_count": int(window.get("removed_duplicates_count", 0) or 0),
+                "semantic_director_used": bool(window.get("semantic_director_used", False)),
+                "semantic_model": str(window.get("semantic_model") or ""),
+                "story_score": round(float(window.get("story_score", 0.0) or 0.0), 4),
+                "hook_score": round(float(window.get("hook_score", 0.0) or 0.0), 4),
+                "context_score": round(float(window.get("context_score", 0.0) or 0.0), 4),
+                "payoff_score": round(float(window.get("payoff_score", 0.0) or 0.0), 4),
+                "semantic_reason": str(window.get("semantic_reason") or ""),
+                "semantic_boundary_adjusted": bool(window.get("semantic_boundary_adjusted", False)),
+                "semantic_fallback_reason": str(window.get("semantic_fallback_reason") or ""),
             }
         )
 
@@ -1032,6 +1049,11 @@ def summarize_rendering_metrics(
 def summarize_subtitle_styles(
     transcript_path: Path,
     windows: list[dict[str, Any]],
+    *,
+    content_type_hint: str = "",
+    expected_speaker_mode: str = "unknown",
+    subtitle_correction_mode: str = SUBTITLE_CORRECTION_MODE_OFF,
+    semantic_model: str = "models/gemini-2.5-flash",
 ) -> dict[str, Any]:
     import subtitler
 
@@ -1050,6 +1072,10 @@ def summarize_subtitle_styles(
             transcript,
             float(window["start"]),
             float(window["duration"]),
+            content_type_hint=content_type_hint,
+            expected_speaker_mode=expected_speaker_mode,
+            subtitle_correction_mode=subtitle_correction_mode,
+            semantic_model=semantic_model,
         )
         speaker_names = sorted({event.get("speaker", "Speaker 0") for event in events})
         style_counter.update(speaker_names)
@@ -1072,6 +1098,12 @@ def summarize_subtitle_styles(
                 "speaker_smoothing_enabled": bool(subtitle_debug.get("speaker_smoothing_enabled", False)),
                 "speaker_smoothing_window": float(subtitle_debug.get("speaker_smoothing_window") or 0.0),
                 "speaker_color_map": subtitle_debug.get("speaker_color_map") or {},
+                "merged_low_duration_speakers": subtitle_debug.get("merged_low_duration_speakers") or [],
+                "speaker_stability_reason": str(subtitle_debug.get("speaker_stability_reason") or ""),
+                "subtitles_corrected": bool(subtitle_debug.get("subtitles_corrected", False)),
+                "subtitle_corrector_used": str(subtitle_debug.get("subtitle_corrector_used") or ""),
+                "corrected_segments_count": int(subtitle_debug.get("corrected_segments_count") or 0),
+                "correction_fallback_reason": str(subtitle_debug.get("correction_fallback_reason") or ""),
             }
         )
 
@@ -1085,6 +1117,39 @@ def summarize_subtitle_styles(
         "speaker_color_map": speaker_color_map,
         "speaker_smoothing_enabled": True,
         "speaker_smoothing_window": float(getattr(subtitler, "DEFAULT_SPEAKER_SMOOTHING_WINDOW", 0.0)),
+        "merged_low_duration_speakers": sorted(
+            {
+                speaker
+                for clip_summary in clip_summaries
+                for speaker in (clip_summary.get("merged_low_duration_speakers") or [])
+            }
+        ),
+        "speaker_stability_reason": next(
+            (
+                str(clip_summary.get("speaker_stability_reason") or "")
+                for clip_summary in clip_summaries
+                if clip_summary.get("speaker_stability_reason")
+            ),
+            "",
+        ),
+        "subtitles_corrected": any(bool(clip_summary.get("subtitles_corrected")) for clip_summary in clip_summaries),
+        "subtitle_corrector_used": next(
+            (
+                str(clip_summary.get("subtitle_corrector_used") or "")
+                for clip_summary in clip_summaries
+                if clip_summary.get("subtitle_corrector_used")
+            ),
+            "off",
+        ),
+        "corrected_segments_count": sum(int(clip_summary.get("corrected_segments_count") or 0) for clip_summary in clip_summaries),
+        "correction_fallback_reason": next(
+            (
+                str(clip_summary.get("correction_fallback_reason") or "")
+                for clip_summary in clip_summaries
+                if clip_summary.get("correction_fallback_reason")
+            ),
+            "",
+        ),
         "clip_event_summary": clip_summaries,
     }
 
@@ -1653,6 +1718,10 @@ def run_selection_scenario(
         args.layout_mode,
         "--ai-mode",
         args.ai_mode,
+        "--semantic-director-mode",
+        args.semantic_director_mode,
+        "--semantic-model",
+        args.semantic_model,
         "--top",
         str(args.top),
     ]
@@ -1749,6 +1818,14 @@ def run_selection_scenario(
             str(raw_dir),
             "--output-subs",
             str(subtitle_dir),
+            "--content-type",
+            str(content_routing.get("content_type") or case.expected_content_type or "generic"),
+            "--expected-speaker-mode",
+            str(case.expected_speaker_mode or "unknown"),
+            "--subtitle-correction-mode",
+            args.subtitle_correction_mode,
+            "--semantic-model",
+            args.semantic_model,
         ]
         subs_ok, subs_tail = run_command(subs_cmd, logs_dir / "subtitler.log")
         if not subs_ok:
@@ -1774,7 +1851,14 @@ def run_selection_scenario(
         windows,
         material_duration=ffprobe_duration(case.video),
     )
-    subtitle_style_metrics = summarize_subtitle_styles(transcript_path, windows)
+    subtitle_style_metrics = summarize_subtitle_styles(
+        transcript_path,
+        windows,
+        content_type_hint=str(content_routing.get("content_type") or case.expected_content_type or "generic"),
+        expected_speaker_mode=str(case.expected_speaker_mode or "unknown"),
+        subtitle_correction_mode=args.subtitle_correction_mode,
+        semantic_model=args.semantic_model,
+    )
 
     manual_override_applied = False
     if scenario["content_type"] != "auto":
@@ -2480,6 +2564,9 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
     if args.case:
         requested = set(args.case)
         cases = [case for case in cases if case.case_id in requested]
+    if str(args.review_batch or "").strip():
+        requested_batch = str(args.review_batch).strip()
+        cases = [case for case in cases if case.review_batch == requested_batch]
 
     latest_results_path = (PROJECT_ROOT / args.output_dir / "results.json").resolve()
     latest_report_path = (PROJECT_ROOT / args.output_dir / "report.md").resolve()
@@ -2618,6 +2705,9 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
         "run_id": run_id,
         "ai_mode": args.ai_mode,
         "subtitle_checker_mode": args.subtitle_checker_mode,
+        "semantic_director_mode": args.semantic_director_mode,
+        "subtitle_correction_mode": args.subtitle_correction_mode,
+        "semantic_model": args.semantic_model,
         "layout_mode": args.layout_mode,
         "available_media": available_media,
         "cases": report_cases,
@@ -2658,6 +2748,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config", default="benchmarks/cases.json", help="Benchmark case config JSON")
     parser.add_argument("--output-dir", default="benchmarks", help="Benchmark output directory")
     parser.add_argument("--case", action="append", default=[], help="Run only selected case id(s)")
+    parser.add_argument("--review-batch", default="", help="Run only cases tagged with the given review_batch")
     parser.add_argument("--top", type=int, default=5, help="How many clips to select per scenario")
     parser.add_argument(
         "--include-compare-strategies",
@@ -2682,6 +2773,19 @@ def parse_args() -> argparse.Namespace:
         choices=VALID_LAYOUT_MODES,
         help="Layout override for final 9:16 rendering.",
     )
+    parser.add_argument(
+        "--semantic-director-mode",
+        default=SEMANTIC_DIRECTOR_MODE_OFF,
+        choices=VALID_SEMANTIC_DIRECTOR_MODES,
+        help="Optional semantic story reviewer for clip selection.",
+    )
+    parser.add_argument(
+        "--subtitle-correction-mode",
+        default=SUBTITLE_CORRECTION_MODE_OFF,
+        choices=VALID_SUBTITLE_CORRECTION_MODES,
+        help="Optional subtitle text correction mode.",
+    )
+    parser.add_argument("--semantic-model", default="models/gemini-2.5-flash", help="Gemini model for semantic review and subtitle correction")
     parser.add_argument("--skip-render", action="store_true", help="Skip cutter/subtitler rendering stages")
     parser.add_argument("--force-transcribe", action="store_true", help="Force fresh local transcription per case")
     parser.add_argument("--transcription-backend", default="faster_whisper", help="Transcription backend")
